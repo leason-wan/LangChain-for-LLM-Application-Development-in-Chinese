@@ -1,0 +1,1060 @@
+1
+00:00:00,000 --> 00:00:09,560
+在这节课中，哈里森将教授最重要的关键构建块，即链。
+In this lesson, Harrison will teach the most important key building block of
+
+2
+00:00:09,560 --> 00:00:11,960
+链通常将一个llm大型语言模型与提示结合在一起。
+land chain, namely the chain.
+
+3
+00:00:12,680 --> 00:00:17,440
+使用这个构建块，您还可以将一堆这些构建块组合在一起，对您的文本或其他数据进行一系列操作。
+The chain usually combines an llm large language model together with a prompt.
+
+4
+00:00:17,720 --> 00:00:21,720
+我很兴奋地深入研究它。
+And with this building block, you can also put a bunch of these building blocks
+
+5
+00:00:21,720 --> 00:00:26,040
+好的，首先，我们要加载环境变量，就像以前一样。
+together to carry out a sequence of operations on your texts or on your other
+
+6
+00:00:26,040 --> 00:00:26,540
+然后我们还要加载一些我们要使用的数据。
+data.
+
+7
+00:00:27,040 --> 00:00:28,400
+这些链的一部分的强大之处在于您可以一次运行它们在许多输入上。
+I'm excited to dive into it.
+
+8
+00:00:28,400 --> 00:00:33,080
+因此，我们将加载一个pandas数据框架。
+All right, to start, we're going to load the environment variables as we have
+
+9
+00:00:33,080 --> 00:00:33,580
+pandas数据框架只是包含许多不同数据元素的数据结构。
+before.
+
+10
+00:00:34,440 --> 00:00:37,240
+如果您不熟悉pandas，请不要担心。
+And then we're also going to load some data that we're going to use.
+
+11
+00:00:38,040 --> 00:00:43,480
+这里的主要观点是我们正在加载一些数据，稍后可以使用。
+So part of the power of these chains is that you can run them over many inputs
+
+12
+00:00:43,800 --> 00:00:44,320
+因此，如果我们查看这个pandas数据框架，我们可以看到有一个
+at a time.
+
+13
+00:00:44,760 --> 00:00:46,600
+产品列，然后是一个评论列。
+Here, we're going to load a pandas data frame.
+
+14
+00:00:47,240 --> 00:00:50,840
+每一行都是一个不同的数据点，我们可以开始通过我们的链传递。
+A pandas data frame is just a data structure that contains a bunch of
+
+15
+00:00:50,840 --> 00:00:52,440
+因此，我们要介绍的第一个链是llm链。
+different elements of data.
+
+16
+00:00:52,520 --> 00:00:54,480
+这是一个简单但非常强大的链，是未来我们将要介绍的许多链的基础。
+If you're not familiar with pandas, don't worry about it.
+
+17
+00:00:54,480 --> 00:00:58,560
+因此，我们将导入三个不同的东西。
+The main point here is that we're loading some data that we can then use later on.
+
+18
+00:00:58,600 --> 00:01:02,000
+我们将导入OpenAI模型。
+And so if we look inside this pandas data frame, we can see that there is a
+
+19
+00:01:02,000 --> 00:01:04,200
+所以llm，我们将导入聊天提示模板。
+product column and then a review column.
+
+20
+00:01:04,280 --> 00:01:07,640
+这是提示，然后我们将导入llm链。
+And each of these rows is a different data point that we can start passing
+
+21
+00:01:07,640 --> 00:01:08,480
+首先，我们要做的是初始化我们要使用的语言模型。
+through our chains.
+
+22
+00:01:09,680 --> 00:01:12,120
+因此，我们将使用高温度初始化聊天OpenAI。
+So the first chain we're going to cover is the llm chain.
+
+23
+00:01:12,200 --> 00:01:16,400
+现在，我们将初始化提示，这个提示将接受一个
+ 
+And this is a simple but really powerful chain that underpins a lot of the chains
+
+24
+00:01:47,640 --> 00:01:48,920
+名为product的变量。
+that we'll go over in the future.
+
+25
+00:01:49,240 --> 00:01:53,000
+它将要求LLM生成描述制造该产品的最佳名称。
+And so we're going to import three different things.
+
+26
+00:01:53,000 --> 00:01:54,680
+公司的名称。
+We're going to import the OpenAI model.
+
+27
+00:01:55,520 --> 00:01:59,120
+最后，我们将把这两个东西组合成一个链。
+So the llm, we're going to import the chat prompt template.
+
+28
+00:01:59,760 --> 00:02:01,880
+这就是我们所谓的LLM链。
+And so this is the prompt and then we're going to import the llm chain.
+
+29
+00:02:02,000 --> 00:02:02,840
+它非常简单。
+And so first, what we're going to do is we're going to initialize the language
+
+30
+00:02:02,840 --> 00:02:06,120
+它只是LLM和提示的组合。
+model that we want to use.
+
+31
+00:02:06,720 --> 00:02:10,640
+但现在，这个链将让我们按顺序运行提示和LLM。
+So we're going to initialize the chat OpenAI with a temperature, with a high
+
+32
+00:02:10,640 --> 00:02:11,400
+因此，如果我们有一个名为“queen size sheet set”的产品，我们可以通过使用chain.run将其运行通过这个链。
+temperature so that we can get some fun descriptions.
+
+33
+00:02:11,680 --> 00:02:16,120
+在幕后，它将格式化提示，然后将整个提示传递到LLM中。
+Now we're going to initialize a prompt and this prompt is going to take in a
+
+34
+00:02:16,120 --> 00:02:17,840
+因此，我们可以看到我们得到了这个假想公司的名称，叫做Royal Beddings。
+variable called product.
+
+35
+00:02:18,240 --> 00:02:21,440
+因此，现在是暂停的好时机，您可以输入任何产品描述，然后查看链将输出什么结果。
+It's going to ask the llm to generate what the best name is to describe a
+
+36
+00:02:21,440 --> 00:02:24,080
+LLM链是最基本的链类型，将在未来经常使用。
+company that makes that product.
+
+37
+00:02:24,400 --> 00:02:28,440
+因此，我们可以看到这将如何在下一个类型的链中使用，即顺序链。
+And then finally, we're going to combine these two things into a chain.
+
+38
+00:02:28,440 --> 00:02:29,320
+因此，顺序链依次运行一系列链。
+And so this is what we call an llm chain.
+
+39
+00:02:30,360 --> 00:02:33,440
+因此，首先，您将导入简单的顺序链。
+And it's quite simple.
+
+40
+00:02:33,440 --> 00:02:36,720
+当我们有只期望一个输入并返回一个输出的子链时，这很有效。
+It's just the combination of the llm and the prompt.
+
+41
+00:02:36,720 --> 00:02:37,160
+结果。
+But now this chain will let us run through the prompt and into the llm in a
+
+42
+00:02:38,120 --> 00:02:42,880
+因此，我们可以看到这将如何在下一个类型的链中使用，即顺序链。
+sequential manner.
+
+43
+00:02:42,880 --> 00:02:43,680
+将经常使用LLM链。
+And so if we have a product called queen size sheet set, we can run this through
+
+44
+00:02:43,880 --> 00:02:47,320
+因此，我们可以看到这将如何在下一个类型的链中使用，即顺序链。
+the chain by using chain.run.
+
+45
+00:02:47,320 --> 00:02:48,440
+因此，顺序链依次运行一系列链。
+And what this will do is it will format the prompt under the hood and then it
+
+46
+00:02:48,440 --> 00:02:52,520
+因此，顺序链依次运行一系列链。
+will pass the whole prompt into the llm.
+
+47
+00:02:52,960 --> 00:02:56,800
+因此，首先，您将导入简单的顺序链。
+And so we can see that we get back the name of this hypothetical company called
+
+48
+00:02:57,240 --> 00:03:00,880
+当我们有只期望一个输入并返回一个输出的子链时，这很有效。
+Royal Beddings.
+
+49
+00:03:00,880 --> 00:03:02,000
+结果。
+And so here would be a good time to pause and you can input any product
+
+50
+00:03:02,760 --> 00:03:07,600
+因此，这里我们将首先创建一个链，它使用LLM和提示。
+descriptions that you would want and you can see what the chain will output as a
+
+51
+00:03:07,600 --> 00:03:08,160
+这个提示将接受产品并返回最佳名称来描述该公司。
+result.
+
+52
+00:03:08,560 --> 00:03:13,640
+那将是第一个链。
+So the llm chain is the most basic type of chain and that's going to be used a
+
+53
+00:03:13,640 --> 00:03:14,640
+然后，我们将创建第二个链。
+lot in the future.
+
+54
+00:03:14,840 --> 00:03:16,080
+在第二个链中，我们将接受公司名称，然后输出该公司的20个单词的描述。
+And so we can see how this will be used in the next type of chain, which will be
+
+55
+00:03:16,080 --> 00:03:18,280
+因此，您可以想象这些链如何一个接一个地运行，
+sequential chains.
+
+56
+00:03:18,680 --> 00:03:23,280
+因此，这里我们将首先创建一个链，它使用LLM和提示。
+And so sequential chains run a sequence of chains one after another.
+
+57
+00:03:23,320 --> 00:03:25,240
+这个提示将接受产品并返回最佳名称来描述该公司。
+So to start, you're going to import the simple sequential chain.
+
+58
+00:03:26,320 --> 00:03:29,920
+因此，您可以想象这些链如何一个接一个地运行，
+ 
+And this works well when we have sub chains that expect only one input and
+
+59
+00:03:30,160 --> 00:03:33,600
+第一个链的输出，即公司名称，然后传递到第二个链中。
+return only one output.
+
+60
+00:03:33,600 --> 00:03:34,200
+第二个链。
+And so here we're going to first create one chain, which uses an llm and a
+
+61
+00:03:35,800 --> 00:03:39,960
+我们可以通过创建一个简单的顺序链来轻松实现这一点，在这个链中，我们有
+prompt.
+
+62
+00:03:39,960 --> 00:03:41,640
+那里描述的两个链。
+And this prompt is going to take in the product and will return the best name to
+
+63
+00:03:42,240 --> 00:03:44,240
+我们将称之为整体简单链。
+describe that company.
+
+64
+00:03:44,240 --> 00:03:49,720
+现在，您可以在任何产品描述上运行此链。
+So that will be the first chain.
+
+65
+00:03:50,600 --> 00:03:54,920
+因此，如果我们将其与上面的产品一起使用，即女王尺寸床单套装，我们可以
+Then we're going to create a second chain.
+
+66
+00:03:54,920 --> 00:03:58,840
+运行它，我们可以看到首先输出皇家博彩，然后将其传递到第二个链中。
+In the second chain, we'll take in the company name and then output a 20 word
+
+67
+00:03:58,840 --> 00:04:00,200
+然后它提出了这家公司可能涉及的描述。
+description of that company.
+
+68
+00:04:00,200 --> 00:04:03,400
+当只有一个输入和一个输出时，简单的顺序链运作良好。
+And so you can imagine how these chains might want to be run one after another,
+
+69
+00:04:05,680 --> 00:04:09,160
+但是当只有一个输入时呢？
+where the output of the first chain, the company name is then passed into the
+
+70
+00:04:09,160 --> 00:04:09,840
+单个输出，但是当有多个输入或多个输出时呢？
+second chain.
+
+71
+00:04:10,320 --> 00:04:12,120
+那么我们可以使用普通的顺序链来实现这一点。
+We can easily do this by creating a simple sequential chain where we have the
+
+72
+00:04:12,120 --> 00:04:16,200
+当然，我们可以使用普通的顺序链来实现这一点。
+two chains described there.
+
+73
+00:04:16,200 --> 00:04:16,680
+输出？
+And we'll call this overall simple chain.
+
+74
+00:04:16,920 --> 00:04:20,080
+因此，我们可以使用普通的顺序链来实现这一点。
+Now, what you can do is run this chain over any product description.
+
+75
+00:04:21,240 --> 00:04:22,160
+所以让我们导入它。
+And so if we use it with the product above the queen size sheet set, we can
+
+76
+00:04:22,160 --> 00:04:25,280
+然后，您将创建一堆链，我们将一个接一个地使用它们。
+run it over and we can see that at first outputs royal betting, and then it
+
+77
+00:04:26,200 --> 00:04:29,200
+我们将使用上面的数据，其中有一个评论。
+passes it into the second chain.
+
+78
+00:04:29,640 --> 00:04:34,320
+因此，第一个链，我们将采取评论并将其翻译成
+And it comes up with this description of what that company could be about.
+
+79
+00:04:34,320 --> 00:04:34,840
+英语。
+The simple sequential chain works well when there's only a single input and a
+
+80
+00:04:37,240 --> 00:04:41,200
+第二个链，我们将创建一个摘要
+single output.
+
+81
+00:04:41,200 --> 00:04:46,840
+一句话。这将使用先前生成的英文评论。
+But what about when there's only one input?
+
+82
+00:04:54,560 --> 00:04:58,720
+因此，如果您注意到，这是使用来自
+And a single output, but what about when there are multiple inputs or multiple
+
+83
+00:04:58,720 --> 00:05:00,320
+原始评论的评论变量。
+outputs?
+
+84
+00:05:02,400 --> 00:05:05,480
+最后，第四个链将接受多个输入。
+And so we can do this by using just the regular sequential chain.
+
+85
+00:05:05,840 --> 00:05:09,560
+因此，这将接受我们使用第二个
+So let's import that.
+
+86
+00:05:09,560 --> 00:05:13,320
+链计算的摘要变量和我们使用第三个链计算的语言变量。
+And then you're going to create a bunch of chains that we're going to use one
+
+87
+00:05:13,760 --> 00:05:17,720
+它将要求在指定的
+after another.
+
+88
+00:05:17,720 --> 00:05:18,240
+语言中对摘要进行跟进回复。
+We're going to be using the data from above, which has a review.
+
+89
+00:05:19,800 --> 00:05:23,640
+关于所有这些子链的一个重要事项是输入键
+ 
+And so the first chain, we're going to take the review and translate it into
+
+90
+00:05:23,720 --> 00:05:25,960
+输出键需要非常精确。
+English.
+
+91
+00:05:26,680 --> 00:05:28,520
+所以在这里我们正在进行审查。
+With a second chain, we're going to create a summary of that review in one
+
+92
+00:05:28,600 --> 00:05:31,120
+这是一个在开始时将传递的变量。
+sentence. And this will use the previously generated English review.
+
+93
+00:05:31,760 --> 00:05:35,320
+我们可以看到我们明确将输出键设置为英文审查。
+The third chain is going to detect what the language of the review was in the
+
+94
+00:05:35,320 --> 00:05:39,840
+然后在下面的下一个提示中使用它，我们接受英文审查
+first place.
+
+95
+00:05:39,840 --> 00:05:44,240
+使用相同的变量名，并将该链的输出键设置为摘要，
+And so if you notice, this is using the review variable that is coming from the
+
+96
+00:05:44,680 --> 00:05:46,920
+我们可以看到它在最终链中使用。
+original review.
+
+97
+00:05:47,800 --> 00:05:52,760
+第三个提示接受审查原始变量和输出语言，
+And finally, the fourth chain will take in multiple inputs.
+
+98
+00:05:53,160 --> 00:05:55,040
+这又在最终提示中使用。
+So this will take in the summary variable, which we calculated with the second
+
+99
+00:05:56,040 --> 00:05:59,760
+确保这些变量名称完全正确非常重要，
+chain and the language variable, which we calculated with the third chain.
+
+100
+00:05:59,920 --> 00:06:02,400
+因为有很多不同的输入和输出。
+And it's going to ask for a follow up response to the summary in the specified
+
+101
+00:06:02,400 --> 00:06:06,160
+如果您遇到任何键错误，一定要检查它们是否对齐。
+language.
+
+102
+00:06:06,160 --> 00:06:12,040
+因此，简单的顺序链接收多个链，其中每个链具有一个
+One important thing to note about all these sub chains is that the input keys
+
+103
+00:06:12,040 --> 00:06:13,680
+单个输入和单个输出。
+and output keys need to be pretty precise.
+
+104
+00:06:14,560 --> 00:06:19,080
+要查看其可视化表示，我们可以查看幻灯片，其中有一个
+So here we're taking in review.
+
+105
+00:06:19,080 --> 00:06:22,760
+链一个接一个地进入另一个链。
+This is a variable that will be passed in at the start.
+
+106
+00:06:24,080 --> 00:06:28,000
+在这里，我们可以看到顺序链的视觉描述，将其与
+We can see that we explicitly set the output key to English review.
+
+107
+00:06:28,000 --> 00:06:32,920
+上面的链进行比较，您可以注意到链中的任何步骤都可以接受多个输入
+This is then used in the next prompt down below where we take in English review
+
+108
+00:06:32,920 --> 00:06:33,720
+变量。
+with that same variable name and we set the output key of that chain to summary,
+
+109
+00:06:34,280 --> 00:06:38,400
+当您拥有更复杂的下游链需要时，这非常有用
+which we can see is used in the final chain.
+
+110
+00:06:38,400 --> 00:06:41,400
+成为多个先前链的组合。
+The third prompt takes in review the original variable and output language,
+
+111
+00:06:42,840 --> 00:06:46,400
+现在我们拥有所有这些链，我们可以轻松地将它们组合在顺序中
+which is again used in the final prompt.
+
+112
+00:06:46,400 --> 00:06:46,920
+链。
+It's really important to get these variable names lined up exactly right,
+
+113
+00:06:47,360 --> 00:06:51,880
+因此，您会注意到我们将创建的四个链传递到
+because there's so many different inputs and outputs going on.
+
+114
+00:06:51,880 --> 00:06:52,760
+链变量。
+And if you get any key errors, you should definitely check that they are lined up.
+
+115
+00:06:52,760 --> 00:06:57,280
+我们将创建具有一个人类输入的输入变量，即
+So the simple sequential chain takes in multiple chains where each one has a
+
+116
+00:06:57,280 --> 00:06:58,000
+审查。
+single input and a single output.
+
+117
+00:06:58,400 --> 00:07:02,200
+然后我们想返回所有中间输出。
+To see a visual representation of this, we can look at the slide where it has one
+
+118
+00:07:02,200 --> 00:07:05,080
+英文审查，摘要，然后是后续消息。
+chain feeding into the other chain one after another.
+
+119
+00:07:07,320 --> 00:07:10,080
+现在我们可以在一些数据上运行它。
+Here we can see a visual description of the sequential chain, comparing it to the
+
+120
+00:07:10,120 --> 00:07:14,800
+所以让我们选择一篇评论并通过整个链传递它。
+above chain, you can notice that any step in the chain can take in multiple input
+
+121
+00:07:20,000 --> 00:07:24,920
+我们可以看到这里的原始评论似乎是法语。
+ 
+variables.
+
+122
+00:07:24,920 --> 00:07:27,680
+我们可以把英文评论看作是一种翻译。
+This is useful when you have more complicated downstream chains that need
+
+123
+00:07:27,680 --> 00:07:31,880
+我们可以看到该评论的摘要，然后我们可以看到一条用法语原文写的跟进信息。
+to be a composition of multiple previous chains.
+
+124
+00:07:31,880 --> 00:07:34,240
+您应该在此暂停视频并尝试输入不同的输入。
+Now that we have all these chains, we can easily combine them in the sequential
+
+125
+00:07:34,800 --> 00:07:38,320
+到目前为止，我们已经涵盖了LLM链和顺序链。
+chain.
+
+126
+00:07:39,040 --> 00:07:42,560
+但是，如果您想做一些更复杂的事情怎么办？
+So you'll notice here that we'll pass in the four chains we created into the
+
+127
+00:07:43,080 --> 00:07:45,600
+一个相当常见但基本的操作是根据输入将其路由到链中。
+chains variable.
+
+128
+00:07:46,200 --> 00:07:50,440
+一个很好的想象方式是，如果您有多个子链，每个子链都专门用于特定类型的输入，您可以有一个路由器链，
+We'll create the inputs variable with the one human input, which is the
+
+129
+00:07:50,440 --> 00:07:52,400
+首先决定要将其传递到哪个子链，然后将其传递到该链。
+review.
+
+130
+00:07:52,400 --> 00:07:57,200
+一个具体的例子是，让我们看看在不同类型的链之间路由的情况，具体取决于似乎出现的主题。
+And then we want to return all the intermediate outputs.
+
+131
+00:07:57,200 --> 00:08:01,720
+所以我们这里有不同的提示。
+So the English review, the summary, and then the follow up message.
+
+132
+00:08:01,760 --> 00:08:06,000
+一个提示适合回答物理问题。
+Now we can run this over some of the data.
+
+133
+00:08:06,000 --> 00:08:06,480
+第二个提示适合回答数学问题。
+So let's choose a review and pass it in through the overall chain.
+
+134
+00:08:07,360 --> 00:08:11,520
+第三个适用于历史，第四个适用于计算机科学。
+We can see here that the original review looks like it was in French.
+
+135
+00:08:11,520 --> 00:08:15,720
+让我们定义所有这些提示模板。
+We can see the English review as a translation.
+
+136
+00:08:16,440 --> 00:08:18,640
+在我们拥有这些提示模板之后，我们可以提供更多信息
+We can see a summary of that review, and then we can see a follow up message in
+
+137
+00:08:18,800 --> 00:08:21,280
+关于它们。
+the original language of French.
+
+138
+00:08:21,280 --> 00:08:23,680
+我们可以为每个模板命名，然后提供描述。
+You should pause the video here and try putting in different inputs.
+
+139
+00:08:23,680 --> 00:08:26,960
+这个物理学的描述适合回答关于物理学的问题。
+So far we've covered the LLM chain and then a sequential chain.
+
+140
+00:08:27,280 --> 00:08:29,440
+这些信息将传递给路由器链。
+But what if you want to do something more complicated?
+
+141
+00:08:33,320 --> 00:08:36,800
+因此，路由器链可以决定何时使用此子链。
+A pretty common, but basic operation is to route an input to a chain, depending
+
+142
+00:08:36,800 --> 00:08:37,320
+我们现在可以导入我们需要的其他类型的链。
+on what exactly that input is.
+
+143
+00:08:37,760 --> 00:08:40,600
+在这里，我们需要一个多提示链。
+A good way to imagine this is if you have multiple sub chains, each of which
+
+144
+00:08:41,160 --> 00:08:44,280
+这是一种特定类型的链，用于在多个不同的提示模板之间进行路由。
+specialized for a particular type of input, you could have a router chain,
+
+145
+00:08:44,280 --> 00:08:44,800
+但是，这只是您可以路由的一种类型。
+which first decides which sub chain to pass it to, and then passes it to that
+
+146
+00:08:45,480 --> 00:08:48,560
+您可以在任何类型的链之间进行路由。
+ 
+chain.
+
+147
+00:09:19,000 --> 00:09:22,400
+这里我们要实现的另外几个类是LLM路由器链。
+For a concrete example, let's look at where we are routing between different
+
+148
+00:09:22,880 --> 00:09:26,840
+这个类本身使用语言模型来在不同的子链之间进行路由。
+types of chains, depending on the subject that seems to come in.
+
+149
+00:09:26,880 --> 00:09:30,360
+这就是上面提供的描述和名称将被使用的地方。
+So we have here different prompts.
+
+150
+00:09:31,160 --> 00:09:33,360
+我们还将导入一个路由器输出解析器。
+One prompt is good for answering physics questions.
+
+151
+00:09:33,920 --> 00:09:38,080
+这将LLM输出解析为可在下游使用的字典，以确定要使用哪个链以及该链的输入应该是什么。
+The second prompt is good for answering math questions.
+
+152
+00:09:38,440 --> 00:09:42,440
+现在我们可以开始使用它了。
+The third for history, and then a fourth for computer science.
+
+153
+00:09:42,440 --> 00:09:44,120
+首先，让我们导入并定义要使用的语言模型。
+Let's define all these prompt templates.
+
+154
+00:09:44,160 --> 00:09:48,680
+现在我们创建目标链。
+After we have these prompt templates, we can then provide more information
+
+155
+00:09:52,000 --> 00:09:54,240
+这些是由路由器链调用的链。
+about them.
+
+156
+00:09:54,400 --> 00:09:57,080
+正如您所看到的，每个目标链本身都是一个语言模型链，
+We can give each one a name and then a description.
+
+157
+00:09:57,560 --> 00:10:01,400
+除了目标链之外，我们还需要一个默认目标链。
+This description for the physics one is good for answering questions about
+
+158
+00:10:01,400 --> 00:10:02,360
+这是一个当路由器无法决定使用哪个子链时调用的链。
+physics.
+
+159
+00:10:04,240 --> 00:10:08,640
+在上面的示例中，当输入问题与物理、数学、历史或计算机科学无关时，可能会调用它。
+This information is going to be passed to the router chain.
+
+160
+00:10:08,640 --> 00:10:12,800
+除了目标链之外，我们还需要一个默认链。
+So the router chain can decide when to use this sub chain.
+
+161
+00:10:13,320 --> 00:10:15,880
+这是一个当路由器无法决定使用哪个子链时调用的链。
+Let's now import the other types of chains that we need.
+
+162
+00:10:16,080 --> 00:10:17,800
+在上面的示例中，当输入问题与物理、数学、历史或计算机科学无关时，可能会调用它。
+Here we need a multi-prompt chain.
+
+163
+00:10:18,080 --> 00:10:22,000
+现在我们定义了LLM用于在不同链之间进行路由的模板。
+This is a specific type of chain that is used when routing between multiple
+
+164
+00:10:22,000 --> 00:10:25,800
+这包括要完成的任务的说明以及输出应该采用的特定格式。
+different prompt templates.
+
+165
+00:10:28,120 --> 00:10:31,760
+让我们将其中一些部分组合起来构建路由器链。
+As you can see, all the options we have are prompt templates themselves.
+
+166
+00:10:31,760 --> 00:10:33,800
+首先，我们通过格式化上面定义的目标创建完整的路由器模板。
+But this is just one type of thing that you can route between.
+
+167
+00:10:34,720 --> 00:10:37,000
+这个模板可以适应许多不同类型的目标。
+You can route between any type of chain.
+
+168
+00:10:37,000 --> 00:10:40,440
+在这里，您可以暂停并添加不同类型的目标。
+The other classes that we'll implement here are an LLM router chain.
+
+169
+00:10:41,680 --> 00:10:44,840
+因此，在这里，您可以添加一个不同的学科，如英语或拉丁语，而不仅仅是物理、数学、历史和计算机科学。
+This uses a language model itself to route between the different sub chains.
+
+170
+00:10:45,600 --> 00:10:48,520
+接下来，我们从这个模板创建提示模板，
+This is where the description and the name provided above will be used.
+
+171
+00:10:48,520 --> 00:10:50,480
+然后通过传入LLM和整个路由器提示来创建路由器链。
+We'll also import a router output parser.
+
+172
+00:10:50,920 --> 00:10:54,280
+这个模板可以适应许多不同类型的目标。
+This parses the LLM output into a dictionary that can be used downstream
+
+173
+00:10:54,720 --> 00:10:58,520
+在这里，您可以暂停并添加不同类型的目标。
+to determine which chain to use and what the input to that chain should be.
+
+174
+00:10:59,000 --> 00:11:02,160
+因此，在这里，您可以添加一个不同的学科，如英语或拉丁语，而不仅仅是物理、数学、历史和计算机科学。
+Now we can get around to using it.
+
+175
+00:11:02,160 --> 00:11:04,960
+接下来，我们从这个模板创建提示模板，
+First, let's import and define the language model that we will use.
+
+176
+00:11:04,960 --> 00:11:07,760
+然后通过传入LLM和整个路由器提示来创建路由器链。
+ 
+We now create the destination chains.
+
+177
+00:11:13,960 --> 00:11:16,360
+请注意，这里有路由器输出解析器。
+These are the chains that will be called by the router chain.
+
+178
+00:11:16,720 --> 00:11:19,320
+这很重要，因为它将帮助这个链路决定
+As you can see, each destination chain itself is a language model chain,
+
+179
+00:11:19,720 --> 00:11:22,160
+在哪些子链路之间进行路由。
+an LLM chain.
+
+180
+00:11:24,760 --> 00:11:28,920
+最后，将所有内容整合在一起，我们可以创建整体链路。
+In addition to the destination chains, we also need a default destination chain.
+
+181
+00:11:29,240 --> 00:11:32,400
+它有一个路由器链路，在这里定义。
+In addition to the destination chains, we also need a default chain.
+
+182
+00:11:32,400 --> 00:11:35,200
+它有目标链路，我们在这里传递。
+This is a chain that's called when the router can't decide
+
+183
+00:11:35,400 --> 00:11:37,200
+然后我们还传递默认链路。
+which of the sub chains to use.
+
+184
+00:11:38,880 --> 00:11:40,200
+现在我们可以使用这个链路。
+And the example above, this might be called when the input question
+
+185
+00:11:40,520 --> 00:11:41,960
+所以让我们问一些问题。
+has nothing to do with physics, math, history or computer science.
+
+186
+00:11:42,560 --> 00:11:45,320
+如果我们问一个物理问题，
+Now we define the template that is used by the LLM
+
+187
+00:11:45,520 --> 00:11:48,920
+我们应该希望看到它被路由到物理链路
+to route between the different chains.
+
+188
+00:11:49,640 --> 00:11:52,560
+输入是什么，黑体辐射是什么？
+This has instructions of the task to be done,
+
+189
+00:11:52,800 --> 00:11:55,480
+然后它被传递到下面的链路中。
+as well as the specific formatting that the output should be in.
+
+190
+00:11:55,480 --> 00:11:59,080
+我们可以看到回答非常详细
+Let's put a few of these pieces together to build the router chain.
+
+191
+00:11:59,080 --> 00:12:01,080
+有很多物理细节。
+First, we create the full router template by formatting it
+
+192
+00:12:01,080 --> 00:12:04,600
+您应该在此暂停视频并尝试输入不同的内容。
+with the destinations that we defined above.
+
+193
+00:12:04,920 --> 00:12:08,520
+您可以尝试使用我们上面定义的所有其他类型的特殊链路
+This template is flexible to a bunch of different types of destinations.
+
+194
+00:12:08,520 --> 00:12:09,920
+。
+One thing you can do here is pause and add different types of destinations.
+
+195
+00:12:10,440 --> 00:12:13,240
+因此，例如，如果我们问一个数学问题，
+So up here, rather than just physics, math, history and computer science,
+
+196
+00:12:21,600 --> 00:12:23,680
+我们应该看到它被路由到数学链路
+you could add a different subject like English or Latin.
+
+197
+00:12:24,040 --> 00:12:25,120
+然后传递到那里。
+Next, we create the prompt template from this template,
+
+198
+00:12:25,120 --> 00:12:27,720
+我们还可以看到当我们传递一个问题时会发生什么
+and then we create the router chain by passing in the LLM
+
+199
+00:12:27,920 --> 00:12:30,320
+与任何子链路都无关的。
+and the overall router prompt.
+
+200
+00:12:30,720 --> 00:12:33,480
+所以在这里，我们问一个关于生物学的问题
+Note that here we have the router output parser.
+
+201
+00:12:33,760 --> 00:12:35,880
+我们可以看到它选择的链路是无。
+This is important as it will help this chain decide
+
+202
+00:12:36,520 --> 00:12:38,400
+这意味着它将被传递到默认链路，
+which sub chains to route between.
+
+203
+00:12:38,400 --> 00:12:41,360
+它本身只是对语言模型的通用调用。
+And finally, putting it all together, we can create the overall chain.
+
+204
+00:12:41,560 --> 00:12:43,680
+语言模型幸运地对生物学知道很多，
+This has a router chain, which is defined here.
+
+205
+00:12:43,680 --> 00:12:44,880
+所以它可以帮助我们。
+It has destination chains, which we pass in here.
+
+206
+00:12:46,080 --> 00:12:48,120
+现在我们已经涵盖了这些基本问题，
+And then we also pass in the default chain.
+
+207
+00:12:48,120 --> 00:12:50,120
+让我们继续视频的下一部分。
+We can now use this chain.
+
+208
+00:12:50,120 --> 00:12:52,120
+那就是如何创建一个新的链路。
+So let's ask it some questions.
+
+209
+00:12:52,120 --> 00:12:55,120
+因此，例如，在下一部分中，
+If we ask it a question about physics,
+
+210
+00:12:55,120 --> 00:12:57,120
+我们将介绍如何创建一个链路
+we should hopefully see that it is routed to the physics chain
+
+211
+00:12:57,120 --> 00:13:22,120
+可以对您的文档进行问答。
+with the input, what is blackbody radiation?

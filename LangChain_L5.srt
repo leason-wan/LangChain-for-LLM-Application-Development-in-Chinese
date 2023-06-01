@@ -1,0 +1,1239 @@
+1
+00:00:01,000 --> 00:00:16,000
+当使用llm构建复杂应用程序时，评估应用程序的表现是一个重要但有时棘手的步骤。它是否满足某些准确性标准？
+When building a complex application using an llm, one of the important but sometimes tricky steps is how do you evaluate how well your application is doing? Is it meeting some accuracy criteria?
+
+2
+00:00:16,000 --> 00:00:33,000
+此外，如果您决定更改实现，可能会交换不同的llm或更改如何使用矢量数据库或其他内容检索通道或更改系统的某些其他参数的策略，那么如何知道您是在使其变得更好还是更糟？
+And also, if you decide to change your implementation, maybe swap in a different llm or change the strategy of how you use a vector database or something else to retrieve channels or change some other parameters of your system, how do you know if you're making it better or worse?
+
+3
+00:00:34,000 --> 00:00:42,000
+在本视频中，哈里森将深入探讨一些框架，以思考如何评估基于llm的应用程序以及一些工具来帮助您做到这一点。
+In this video, Harrison will dive into some frameworks for how to think about evaluating a llm-based application as well as some tools to help you do that.
+
+4
+00:00:42,000 --> 00:00:53,000
+这些应用程序实际上是许多不同步骤的链和序列。因此，老实说，您应该做的第一件事就是了解每个步骤的具体情况。
+These applications are really chains and sequences of a lot of different steps. And so, honestly, part of the first thing that you should do is just understand what exactly is going in and coming out of each step.
+
+5
+00:00:54,000 --> 00:00:58,000
+因此，一些工具实际上可以被视为可视化器或调试器。
+And so, some of the tools can really just be thought of as visualizers or debuggers in that vein.
+
+6
+00:00:59,000 --> 00:01:04,000
+但是，通常更有用的是从许多不同的数据点中获得更全面的模型表现情况。
+But it's often really useful to get a more holistic picture on a lot of different data points of how the model is doing.
+
+7
+00:01:04,000 --> 00:01:15,000
+一种方法是通过肉眼观察来做到这一点。但是，还有这个非常酷的想法，即使用语言模型本身和链本身来评估其他语言模型、其他链和其他应用程序。
+And one way to do that is by looking at things by eye. But there's also this really cool idea of using language models themselves and chains themselves to evaluate other language models and other chains and other applications.
+
+8
+00:01:16,000 --> 00:01:17,000
+我们也将深入探讨这个想法。
+And we'll dive a bunch into that as well.
+
+9
+00:01:18,000 --> 00:01:30,000
+因此，有很多很酷的主题。我发现随着许多开发转向基于提示的开发，使用llm开发应用程序，整个工作流程评估过程正在被重新思考。
+So, lots of cool topics. And I find that with a lot of development shifting towards prompting-based development, developing applications using llms, this whole workflow evaluation process is being rethought.
+
+10
+00:01:30,000 --> 00:01:34,000
+因此，在本视频中有许多令人兴奋的概念。让我们开始吧。
+So, lots of exciting concepts in this video. Let's dive in.
+
+11
+00:01:35,000 --> 00:01:38,000
+好的。那么，让我们开始评估。
+All right. So, let's get set up with evaluation.
+
+12
+00:01:39,000 --> 00:01:44,000
+首先，我们需要有我们要评估的链或应用程序。
+First, we need to have the chain or the application that we're going to evaluate in the first place.
+
+13
+00:01:45,000 --> 00:01:49,000
+我们将使用上一课的文档问答链。
+And we're going to use the document question answering chain from the previous lesson.
+
+14
+00:01:50,000 --> 00:01:55,000
+因此，我们将导入我们需要的所有内容。我们将加载相同的数据。
+So, we're going to import everything we need. We're going to load the same data that we were using.
+
+15
+00:01:55,000 --> 00:01:58,000
+我们将用一行代码创建该索引。
+We're going to create that index with one line.
+
+16
+00:01:59,000 --> 00:02:11,000
+然后，我们将通过指定语言模型、链类型、检索器和我们要打印的详细程度来创建检索QA链。
+And then we're going to create the retrieval QA chain by specifying the language model, the chain type, the retriever, and then the verbosity that we're going to print out.
+
+17
+00:02:13,000 --> 00:02:14,000
+因此，我们有了这个应用程序。
+So, we've got this application.
+
+18
+00:02:14,000 --> 00:02:25,000
+我们需要做的第一件事是真正弄清楚我们想要评估它的一些数据点。
+ 
+And the first thing we need to do is we need to really figure out what are some data points that we want to evaluate it on.
+
+19
+00:02:26,000 --> 00:02:29,000
+因此，我们将介绍几种不同的方法来完成这个任务。
+And so, there's a few different methods that we're going to cover for doing this.
+
+20
+00:02:30,000 --> 00:02:37,000
+第一种方法是最简单的，基本上我们将自己想出好的数据点作为例子。
+The first is the most simple, which is basically we're going to come up with data points that we think are good examples ourselves.
+
+21
+00:02:37,000 --> 00:02:47,000
+为此，我们可以查看一些数据，然后想出例子问题和答案，以便以后用于评估。
+And so, to do that, we can just look at some of the data and come up with example questions and then example ground truth answers that we can later use to evaluate.
+
+22
+00:02:48,000 --> 00:02:55,000
+因此，如果我们查看这里的一些文档，我们可以对其中发生的事情有所了解。
+So, if we look at a few of the documents here, we can kind of get a sense of what's going on inside them.
+
+23
+00:02:56,000 --> 00:03:01,000
+看起来第一个文档中有这个套头衫，第二个文档中有这个夹克。
+It looks like the first one. There's this pullover set. There's this in the second one.
+
+24
+00:03:02,000 --> 00:03:05,000
+它们都有很多细节。
+There's this jacket. It has a bunch of details about all of them.
+
+25
+00:03:05,000 --> 00:03:10,000
+从这些细节中，我们可以创建一些例子查询和答案对。
+And from these details, we can create some example query and answer pairs.
+
+26
+00:03:11,000 --> 00:03:16,000
+因此，我们可以问一个简单的问题，这个舒适的套头衫套装有侧口袋吗？
+So, the first one, we can ask a simple, does the cozy comfort pullover set have side pockets?
+
+27
+00:03:17,000 --> 00:03:22,000
+我们可以通过上面的内容看到，它确实有一些侧口袋。
+And we can see by looking above that it does, in fact, have some side pockets in it.
+
+28
+00:03:23,000 --> 00:03:29,000
+然后对于第二个文档，我们可以看到这件夹克来自某个系列，即down tech系列。
+And then for the second one, we can see that this jacket is from a certain collection, the down tech collection.
+
+29
+00:03:30,000 --> 00:03:32,000
+因此，我们可以问一个问题，这件夹克来自哪个系列？
+And so, we can ask a question, what collection is this jacket from?
+
+30
+00:03:32,000 --> 00:03:35,000
+答案是down tech系列。
+And have the answer be the down tech collection.
+
+31
+00:03:36,000 --> 00:03:38,000
+因此，我们创建了两个例子。
+And so, here we've created two examples.
+
+32
+00:03:39,000 --> 00:03:41,000
+但这并不是很可扩展。
+But this doesn't really scale that well.
+
+33
+00:03:42,000 --> 00:03:45,000
+需要花费一些时间查看每个例子并弄清楚发生了什么。
+It takes a bit of time to look through each example and figure out what's going on.
+
+34
+00:03:46,000 --> 00:03:48,000
+因此，有没有一种方法可以自动化？
+And so, is there a way that we can automate it?
+
+35
+00:03:49,000 --> 00:03:53,000
+我们认为可以使用语言模型本身来实现这一点。
+And one of the really cool ways that we think we can automate it is with language models themselves.
+
+36
+00:03:54,000 --> 00:03:57,000
+因此，我们在LangChain中有一个链可以做到这一点。
+So, we have a chain in LangChain that can do exactly that.
+
+37
+00:03:58,000 --> 00:04:00,000
+因此，我们可以导入QA生成链。
+So, we can import the QA generation chain.
+
+38
+00:04:00,000 --> 00:04:05,000
+它将接收文档，并从每个文档中创建一个问题答案对。
+And this will take in documents and it will create a question answer pair from each document.
+
+39
+00:04:06,000 --> 00:04:08,000
+它将使用语言模型本身来完成这一点。
+It'll do this using a language model itself.
+
+40
+00:04:09,000 --> 00:04:13,000
+因此，我们需要通过传递chat open AI语言模型来创建这个链。
+So, we need to create this chain by passing in the chat open AI language model.
+
+41
+00:04:14,000 --> 00:04:16,000
+然后，我们可以创建许多例子。
+And then from there, we can create a bunch of examples.
+
+42
+00:04:17,000 --> 00:04:23,000
+因此，我们将使用apply和parse方法，因为这将应用输出解析器到结果。
+And so, we're going to use the apply and parse method because this is applying an output parser to the result.
+
+43
+00:04:24,000 --> 00:04:27,000
+因为我们想要得到一个具有查询和答案对的字典，
+Because we want to get back a dictionary that has the query and answer pair,
+
+44
+00:04:27,000 --> 00:04:29,000
+而不仅仅是一个字符串。
+ 
+not just a single string.
+
+45
+00:04:36,000 --> 00:04:39,000
+因此，现在如果我们看看这里返回了什么，
+And so, now if we look at what exactly is returned here,
+
+46
+00:04:40,000 --> 00:04:42,000
+我们可以看到一个查询和一个答案。
+we can see a query and we can see an answer.
+
+47
+00:04:43,000 --> 00:04:46,000
+让我们检查一下这是一个问题和答案的文档。
+And let's check the document that this is a question and answer for.
+
+48
+00:04:47,000 --> 00:04:49,000
+我们可以看到它正在询问这个的重量。
+And we can see that it's asking what the weight of this is.
+
+49
+00:04:50,000 --> 00:04:52,000
+我们可以看到它正在从这里获取重量。
+We can see that it's taking the weight from here.
+
+50
+00:04:53,000 --> 00:04:54,000
+看看那个。
+And look at that.
+
+51
+00:04:54,000 --> 00:04:56,000
+我们刚刚生成了一堆问题答案对。
+We just generated a bunch of question answer pairs.
+
+52
+00:04:57,000 --> 00:04:58,000
+我们不必自己编写它们。
+We didn't have to write it all ourselves.
+
+53
+00:04:59,000 --> 00:05:02,000
+节省了我们很多时间，我们可以做更有趣的事情。
+Saves us a bunch of time and we can do more exciting things.
+
+54
+00:05:03,000 --> 00:05:08,000
+因此，现在让我们将这些示例添加到我们已经创建的示例中。
+And so, now let's go ahead and add these examples into the examples that we already created.
+
+55
+00:05:09,000 --> 00:05:14,000
+所以，我们现在有了这些示例，但是我们如何评估正在发生的事情呢？
+So, we got these examples now, but how exactly do we evaluate what's going on?
+
+56
+00:05:15,000 --> 00:05:18,000
+我们想做的第一件事就是运行一个示例通过链
+The first thing we want to do is just run an example through the chain
+
+57
+00:05:19,000 --> 00:05:21,000
+并查看它产生的输出。
+and take a look at the output it produces.
+
+58
+00:05:21,000 --> 00:05:25,000
+因此，在这里我们传递一个查询，然后我们得到一个答案。
+So, here we pass in a query and we get back an answer.
+
+59
+00:05:26,000 --> 00:05:29,000
+但是这在了解链中实际发生的事情方面有点受限
+But this is a little bit limiting in terms of what we can see
+
+60
+00:05:30,000 --> 00:05:31,000
+实际上正在发生的事情。
+that's actually happening inside the chain.
+
+61
+00:05:32,000 --> 00:05:34,000
+进入语言模型的实际提示是什么？
+What is the actual prompt that's going into the language model?
+
+62
+00:05:35,000 --> 00:05:37,000
+它检索的文档是什么？
+What are the documents that it retrieves?
+
+63
+00:05:38,000 --> 00:05:40,000
+如果这是一个更复杂的链，其中有多个步骤，
+If this were a more complex chain with multiple steps in it,
+
+64
+00:05:41,000 --> 00:05:42,000
+中间结果是什么？
+what are the intermediate results?
+
+65
+00:05:43,000 --> 00:05:46,000
+仅仅查看最终答案通常不足以了解链中出现了什么问题或可能出现了什么问题。
+It's oftentimes not enough to just look at the final answer
+
+66
+00:05:46,000 --> 00:05:50,000
+为了帮助解决这个问题，我们在LingChain中有一个有趣的小工具，称为LingChainDebug。
+to understand what is or could be going wrong in the chain.
+
+67
+00:05:51,000 --> 00:05:56,000
+因此，如果我们将LingChainDebug设置为true
+And to help with that, we have a fun little util in LingChain called LingChainDebug.
+
+68
+00:06:03,000 --> 00:06:06,000
+现在我们重新运行与上面相同的示例，
+And so, if we set LingChainDebug equals true
+
+69
+00:06:07,000 --> 00:06:11,000
+我们可以看到它开始打印出更多的信息。
+and we now rerun the same example as above,
+
+70
+00:06:12,000 --> 00:06:14,000
+因此，如果我们看看它到底打印了什么，
+we can see that it starts printing out a lot more information.
+
+71
+00:06:14,000 --> 00:06:18,000
+我们可以看到它首先深入到检索QA链中
+And so, if we look at what exactly it's printing out,
+
+72
+00:06:19,000 --> 00:06:21,000
+然后它进入了一些文档链。
+we can see that it's diving down first into the retrieval QA chain
+
+73
+00:06:22,000 --> 00:06:24,000
+因此，如上所述，我们正在使用stuff方法。
+and then it's going down into a stuff documents chain.
+
+74
+00:06:25,000 --> 00:06:28,000
+现在它正在进入LLM链，我们有几个不同的输入。
+And so, as mentioned, we're using the stuff method.
+
+75
+00:06:29,000 --> 00:06:31,000
+因此，我们可以看到原始问题就在那里。
+And now it's entering the LLM chain where we have a few different inputs.
+
+76
+00:06:32,000 --> 00:06:33,000
+现在我们正在传递这个上下文。
+ 
+So, we can see the original question is right there.
+
+77
+00:06:34,000 --> 00:06:36,000
+我们可以看到，这个上下文是由我们检索到的不同文档创建的。
+And now we're passing in this context.
+
+78
+00:06:37,000 --> 00:06:40,000
+因此，在进行问答时，当返回错误结果时，
+And we can see that this context is created
+
+79
+00:06:41,000 --> 00:06:42,000
+通常不是语言模型本身出错了。
+from a bunch of the different documents that we've retrieved.
+
+80
+00:06:42,000 --> 00:06:44,000
+实际上是检索步骤出错了。
+And so, when doing question answering,
+
+81
+00:06:45,000 --> 00:06:48,000
+因此，仔细查看问题的确切内容和上下文可以帮助调试出错的原因。
+oftentimes when a wrong result is returned,
+
+82
+00:06:49,000 --> 00:06:50,000
+然后，我们可以再向下一级
+it's not necessarily the language model itself that's messing up.
+
+83
+00:06:51,000 --> 00:06:54,000
+看看进入语言模型的确切内容，
+It's actually the retrieval step that's messing up.
+
+84
+00:06:55,000 --> 00:06:58,000
+以及 OpenAI 自身。
+And so, taking a really close look at what exactly the question is
+
+85
+00:06:59,000 --> 00:07:01,000
+因此，在这里，我们可以看到传递的完整提示。
+and what exactly the context is can help debug what's going wrong.
+
+86
+00:07:02,000 --> 00:07:04,000
+所以，我们有一个系统消息。
+We can then step down one more level
+
+87
+00:07:05,000 --> 00:07:06,000
+我们有所使用的提示的描述。
+and see exactly what is entering the language model,
+
+88
+00:07:07,000 --> 00:07:09,000
+因此，这是问题回答链使用的提示，
+chat open AI itself.
+
+89
+00:07:09,000 --> 00:07:11,000
+我们甚至直到现在都没有看过。
+And so, here we can see the full prompt that's passed in.
+
+90
+00:07:12,000 --> 00:07:14,000
+因此，我们可以看到提示打印出来，
+So, we've got a system message.
+
+91
+00:07:15,000 --> 00:07:17,000
+使用以下上下文片段回答用户的问题。
+We've got the description of the prompt that's used.
+
+92
+00:07:18,000 --> 00:07:19,000
+如果您不知道答案，只需说您不知道即可。
+And so, this is the prompt that the question answering chain
+
+93
+00:07:20,000 --> 00:07:21,000
+不要试图编造答案。
+is using under the hood,
+
+94
+00:07:22,000 --> 00:07:23,000
+然后我们看到一堆之前插入的上下文，
+which we actually haven't even looked at until now.
+
+95
+00:07:24,000 --> 00:07:26,000
+然后我们看到一个人类问题，
+And so, we can see the prompt printing out,
+
+96
+00:07:27,000 --> 00:07:28,000
+也就是我们问它的问题。
+use the following pieces of context to answer the user's question.
+
+97
+00:07:29,000 --> 00:07:30,000
+我们还可以看到有关实际返回类型的更多信息。
+If you don't know the answer, just say that you don't know.
+
+98
+00:07:31,000 --> 00:07:33,000
+因此，我们不仅仅返回一个字符串，
+Don't try to make up an answer.
+
+99
+00:07:34,000 --> 00:07:35,000
+我们还返回了许多信息，如令牌使用情况，
+And then we see a bunch of the context as inserted before.
+
+100
+00:07:36,000 --> 00:07:37,000
+因此，提示令牌、完成令牌、
+And then we see a human question,
+
+101
+00:07:38,000 --> 00:07:40,000
+总令牌和模型名称。
+which is the question that we asked it.
+
+102
+00:07:41,000 --> 00:07:42,000
+这可以非常有用地跟踪您在链中使用的令牌
+We can also see a lot more information about the actual return type.
+
+103
+00:07:43,000 --> 00:07:45,000
+或随时间调用语言模型的令牌
+So, rather than just a string,
+
+104
+00:07:46,000 --> 00:07:47,000
+并跟踪总令牌数，
+we get back a bunch of information like the token usage,
+
+105
+00:07:48,000 --> 00:07:50,000
+这与总成本非常接近。
+so the prompt tokens, the completion tokens,
+
+106
+00:07:51,000 --> 00:07:53,000
+由于这是一个相对简单的链，
+the total tokens, and the model name.
+
+107
+00:07:54,000 --> 00:07:55,000
+我们现在可以看到最终的响应，
+ 
+And this can be really useful to track the tokens
+
+108
+00:08:07,000 --> 00:08:09,000
+舒适的毛衣套装，条纹款，
+that you're using in your chains
+
+109
+00:08:10,000 --> 00:08:11,000
+有侧袋，正在起泡，
+or calls to language models over time
+
+110
+00:08:12,000 --> 00:08:14,000
+通过链条返回给用户。
+and keep track of the total number of tokens,
+
+111
+00:08:15,000 --> 00:08:17,000
+因此，我们刚刚讲解了如何查看和调试单个输入到该链的情况。
+which corresponds very closely to the total cost.
+
+112
+00:08:18,000 --> 00:08:21,000
+但是我们创建的所有示例呢？
+And because this is a relatively simple chain,
+
+113
+00:08:22,000 --> 00:08:23,000
+我们该如何评估它们？
+we can now see that the final response,
+
+114
+00:08:24,000 --> 00:08:25,000
+与创建它们类似，
+the cozy comfort pullover set, Stripe,
+
+115
+00:08:26,000 --> 00:08:28,000
+一种方法是手动进行。
+does have side pockets, is getting bubbled up
+
+116
+00:08:29,000 --> 00:08:30,000
+我们可以运行链条来处理所有示例，
+through the chains and getting returned to the user.
+
+117
+00:08:31,000 --> 00:08:32,000
+然后查看输出并尝试弄清楚
+So, we've just walked through how to look at
+
+118
+00:08:32,000 --> 00:08:34,000
+发生了什么，它是否正确，
+and debug what's going on with a single input to this chain.
+
+119
+00:08:35,000 --> 00:08:36,000
+不正确，部分正确。
+But what about all the examples we created?
+
+120
+00:08:37,000 --> 00:08:38,000
+与创建示例类似，
+How are we going to evaluate those?
+
+121
+00:08:39,000 --> 00:08:40,000
+随着时间的推移，这开始变得有点乏味。
+Similarly to when creating them,
+
+122
+00:08:41,000 --> 00:08:42,000
+因此，让我们回到我们最喜欢的解决方案。
+one way to do it would be manually.
+
+123
+00:08:43,000 --> 00:08:45,000
+我们可以要求语言模型来做吗？
+We could run the chain over all the examples,
+
+124
+00:08:46,000 --> 00:08:48,000
+首先，我们需要为所有示例创建预测。
+then look at the outputs and try to figure out
+
+125
+00:08:49,000 --> 00:08:51,000
+在这之前，我要关闭
+what's going on, whether it's correct,
+
+126
+00:08:52,000 --> 00:08:54,000
+调试模式，以便不将所有内容打印到屏幕上。
+incorrect, partially correct.
+
+127
+00:08:55,000 --> 00:08:57,000
+然后我将为所有不同的示例创建预测。
+Similar to creating the examples,
+
+128
+00:08:58,000 --> 00:08:59,000
+因此，我认为我们总共有七个示例。
+that starts to get a little bit tedious over time.
+
+129
+00:09:00,000 --> 00:09:01,000
+现在我们有了这些示例，
+And so, let's go back to our favorite solution.
+
+130
+00:09:02,000 --> 00:09:03,000
+我们可以考虑评估它们。
+Can we ask a language model to do it?
+
+131
+00:09:04,000 --> 00:09:06,000
+因此，我们将导入QA，
+First, we need to create predictions for all the examples.
+
+132
+00:09:07,000 --> 00:09:09,000
+问题回答，评估链。
+Before doing that, I'm actually going to turn off
+
+133
+00:09:09,000 --> 00:09:29,000
+我们将通过语言模型创建此链，
+the debug mode in order to just not print
+
+134
+00:09:30,000 --> 00:09:31,000
+因为我们将使用语言模型
+everything out onto the screen.
+
+135
+00:09:32,000 --> 00:09:33,000
+来帮助进行评估。
+And then I'm going to create predictions
+
+136
+00:09:34,000 --> 00:09:35,000
+然后我们将在此链上调用evaluate。
+for all the different examples.
+
+137
+00:09:35,000 --> 00:09:38,000
+我们将传入示例和预测，
+And so, I think we had seven examples total.
+
+138
+00:09:39,000 --> 00:09:40,000
+然后我们将得到一堆分级输出。
+And so, we're going to loop through this chain
+
+139
+00:09:41,000 --> 00:09:42,000
+因此，为了看到每个示例的情况，
+ 
+seven times, getting a prediction for each one.
+
+140
+00:10:07,000 --> 00:10:08,000
+我们将循环遍历它们。
+Now that we've got these examples,
+
+141
+00:10:09,000 --> 00:10:10,000
+我们将打印出问题。
+we can think about evaluating them.
+
+142
+00:10:11,000 --> 00:10:12,000
+而且，这是由语言模型生成的。
+So, we're going to import the QA,
+
+143
+00:10:13,000 --> 00:10:14,000
+我们将打印出真正的答案。
+question answering, eval chain.
+
+144
+00:10:15,000 --> 00:10:17,000
+而且，这也是由语言模型生成的。
+We are going to create this chain
+
+145
+00:10:18,000 --> 00:10:19,000
+当它面前有整个文档时，它可以生成一个真实的答案。
+with a language model, because again,
+
+146
+00:10:20,000 --> 00:10:22,000
+因此，它可以生成一个真实的答案。
+we're going to be using a language model
+
+147
+00:10:23,000 --> 00:10:24,000
+我们将打印出预测的答案。
+to help do the evaluation.
+
+148
+00:10:25,000 --> 00:10:26,000
+这是由语言模型生成的。
+And then we're going to call evaluate on this chain.
+
+149
+00:10:27,000 --> 00:10:28,000
+当它进行QA链时，
+We're going to pass in examples and predictions,
+
+150
+00:10:29,000 --> 00:10:30,000
+当它使用嵌入和向量数据库进行检索时，
+and we're going to get back a bunch of graded outputs.
+
+151
+00:10:30,000 --> 00:10:32,000
+然后将其传递到语言模型中，
+And so, in order to see what exactly
+
+152
+00:10:33,000 --> 00:10:35,000
+然后尝试猜测预测的答案。
+is going on for each example,
+
+153
+00:10:36,000 --> 00:10:37,000
+然后我们还将打印出成绩。
+we're going to loop through them.
+
+154
+00:10:38,000 --> 00:10:40,000
+而且，这也是由语言模型生成的
+We're going to print out the question.
+
+155
+00:10:41,000 --> 00:10:43,000
+当它要求评估链评估正在发生的事情时，
+And again, this was generated by a language model.
+
+156
+00:10:44,000 --> 00:10:45,000
+以及它是否正确或不正确。
+We're going to print out the real answer.
+
+157
+00:10:46,000 --> 00:10:47,000
+因此，当我们循环遍历所有这些示例并将它们打印出来时，
+And again, this was also generated by a language model
+
+158
+00:10:48,000 --> 00:10:49,000
+我们可以详细了解每个示例。
+when it had the whole document in front of it.
+
+159
+00:10:50,000 --> 00:10:53,000
+对于每个示例，它看起来都是正确的。
+And so, it could generate a ground truth answer.
+
+160
+00:10:54,000 --> 00:10:56,000
+这是一个相对简单的检索问题，
+We're going to print out the predicted answer.
+
+161
+00:11:00,000 --> 00:11:01,000
+所以这是令人放心的。
+And this is generated by a language model
+
+162
+00:11:02,000 --> 00:11:04,000
+那么，让我们看看第一个例子。
+when it's doing the QA chain,
+
+163
+00:11:05,000 --> 00:11:07,000
+这里的问题是，舒适的套头衫套装
+when it's doing the retrieval with the embeddings
+
+164
+00:11:08,000 --> 00:11:09,000
+有侧口袋吗？
+and the vector databases, passing that into a language model,
+
+165
+00:11:10,000 --> 00:11:11,000
+真正的答案，我们创建了这个，是肯定的。
+and then trying to guess the predicted answer.
+
+166
+00:11:12,000 --> 00:11:14,000
+预测的答案，语言模型产生的，
+And then we're also going to print out the grade.
+
+167
+00:11:15,000 --> 00:11:17,000
+是舒适的套头衫套装条纹
+And again, this is also generated by a language model
+
+168
+00:11:18,000 --> 00:11:19,000
+确实有侧口袋。
+when it's asking the eval chain to grade what's going on
+
+169
+00:11:20,000 --> 00:11:22,000
+因此，我们可以理解这是一个正确的答案。
+and whether it's correct or incorrect.
+
+170
+00:11:22,000 --> 00:11:25,000
+实际上，语言模型也是这样，
+And so, when we loop through all these examples
+
+171
+00:11:26,000 --> 00:11:27,000
+它将其评为正确。
+and print them out, we can see those in detail
+
+172
+00:11:28,000 --> 00:11:29,000
+但是让我们想想为什么我们需要使用
+for each example.
+
+173
+00:11:30,000 --> 00:11:31,000
+语言模型首先。 
+
+
+ 
+And it looks like here it got everything correct.
+
+174
+00:11:40,000 --> 00:11:41,000
+我甚至认为“是”的字眼都没有出现过。
+This is a relatively simple retrieval problem,
+
+175
+00:11:42,000 --> 00:11:43,000
+在这个字符串中。
+so that is reassuring.
+
+176
+00:11:44,000 --> 00:11:45,000
+因此，如果我们尝试进行一些字符串匹配
+So, let's look at the first example.
+
+177
+00:11:46,000 --> 00:11:47,000
+或精确匹配，甚至在这里使用一些正则表达式，
+The question here is, does the cozy comfort pullover set
+
+178
+00:11:48,000 --> 00:11:49,000
+它就不知道该怎么做了。
+have side pockets?
+
+179
+00:11:49,000 --> 00:11:51,000
+它们不是同一件事。
+The real answer, and we created this, is yes.
+
+180
+00:11:52,000 --> 00:11:53,000
+这显示了使用语言模型进行评估的重要性。
+The predicted answer, which the language model produced,
+
+181
+00:11:54,000 --> 00:11:55,000
+你有这些答案，它们是任意的字符串。
+was the cozy comfort pullover set stripe
+
+182
+00:11:56,000 --> 00:12:00,000
+没有单一的真实字符串是最好的可能答案。
+does have side pockets.
+
+183
+00:12:01,000 --> 00:12:03,000
+有许多不同的变体。
+And so, we can understand that this is a correct answer.
+
+184
+00:12:04,000 --> 00:12:05,000
+只要它们具有相同的语义意义，
+And actually, the language model does as well,
+
+185
+00:12:06,000 --> 00:12:07,000
+它们应该被评为相似。
+and it grades it correct.
+
+186
+00:12:08,000 --> 00:12:09,000
+这就是语言模型的帮助所在，
+But let's think about why we actually need to use
+
+187
+00:12:10,000 --> 00:12:12,000
+而不是仅仅进行精确匹配。
+the language model in the first place.
+
+188
+00:12:16,000 --> 00:12:19,000
+这种比较字符串的困难是使语言模型评估变得如此困难的原因。
+These two strings are actually nothing alike.
+
+189
+00:12:20,000 --> 00:12:23,000
+我们正在将它们用于这些非常开放的任务
+They're very different.
+
+190
+00:12:24,000 --> 00:12:26,000
+其中它们被要求生成文本。
+One's really short, one's really long.
+
+191
+00:12:27,000 --> 00:12:28,000
+这以前并没有真正做过，
+I don't even think yes doesn't appear anywhere
+
+192
+00:12:29,000 --> 00:12:30,000
+因为直到最近的模型还不够好
+in this string.
+
+193
+00:12:31,000 --> 00:12:32,000
+来做到这一点。
+So, if we were to try to do some string matching
+
+194
+00:12:33,000 --> 00:12:34,000
+因此，到目前为止存在的许多评估指标都不够好。
+or exact matching or even some reg x's here,
+
+195
+00:12:35,000 --> 00:12:36,000
+我们不得不发明新的指标
+it wouldn't know what to do.
+
+196
+00:12:37,000 --> 00:12:38,000
+和发明新的启发式方法来做到这一点。
+They're not the same thing.
+
+197
+00:12:39,000 --> 00:12:40,000
+目前最有趣和最受欢迎的
+And that shows off the importance of using
+
+198
+00:12:44,000 --> 00:12:46,000
+这些启发式方法之一
+the language model to do evaluation here.
+
+199
+00:12:47,000 --> 00:12:49,000
+实际上是使用语言模型进行评估。
+You've got these answers, which are arbitrary strings.
+
+200
+00:12:50,000 --> 00:12:51,000
+这结束了评估课程，
+There's no single one-truth string that is
+
+201
+00:12:52,000 --> 00:12:53,000
+但我想向您展示的最后一件事
+the best possible answer.
+
+202
+00:12:54,000 --> 00:12:55,000
+是LangChain评估平台。
+There's many different variants.
+
+203
+00:12:56,000 --> 00:12:58,000
+这是一种在笔记本中执行我们刚刚执行的所有操作的方法，但是将其持久化并在UI中显示。
+And as long as they have the same semantic meaning,
+
+204
+00:12:59,000 --> 00:13:01,000
+因此，让我们来看看。
+ 
+they should be graded as being similar.
+
+205
+00:13:09,000 --> 00:13:13,000
+我们在笔记本中运行的所有运行。
+And that's what a language model helps with,
+
+206
+00:13:14,000 --> 00:13:16,000
+因此，这是跟踪输入和输出的好方法
+as opposed to just doing exact matching.
+
+207
+00:13:17,000 --> 00:13:18,000
+在高层次上，但这也是一种非常好的方式
+This difficulty in comparing strings is what makes
+
+208
+00:13:19,000 --> 00:13:21,000
+看看底层到底发生了什么。
+evaluation of language models so hard in the first place.
+
+209
+00:13:22,000 --> 00:13:24,000
+因此，这是在打开调试模式时打印出的相同信息
+We're using them for these really open-ended tasks
+
+210
+00:13:25,000 --> 00:13:26,000
+在一个 UI 中可视化
+where they're asked to generate text.
+
+211
+00:13:27,000 --> 00:13:28,000
+在一个更好的方式。
+This hasn't really been done before,
+
+212
+00:13:29,000 --> 00:13:31,000
+因此，我们可以看到链的输入
+as models until recently weren't really good enough
+
+213
+00:13:32,000 --> 00:13:33,000
+和每个步骤的链的输出。
+to do this.
+
+214
+00:13:34,000 --> 00:13:35,000
+然后我们可以点击越来越深
+And so a lot of the evaluation metrics that did exist
+
+215
+00:13:36,000 --> 00:13:37,000
+进入链并查看更多信息
+up to this point just aren't good enough.
+
+216
+00:13:37,000 --> 00:13:39,000
+关于实际传递的内容。
+And we're having to invent new ones
+
+217
+00:13:40,000 --> 00:13:41,000
+因此，如果我们一直走到底部，
+and invent new heuristics for doing so.
+
+218
+00:13:42,000 --> 00:13:43,000
+我们现在可以看到正在传递什么
+And the most interesting and most popular
+
+219
+00:13:44,000 --> 00:13:45,000
+确切地到聊天模型。
+of those heuristics at the moment
+
+220
+00:13:46,000 --> 00:13:47,000
+我们在这里有系统消息。
+is actually using a language model to do the evaluation.
+
+221
+00:13:48,000 --> 00:13:49,000
+我们在这里有人类问题。
+This finishes the evaluation lesson,
+
+222
+00:13:50,000 --> 00:13:51,000
+我们在这里有聊天模型的响应。
+but one last thing I want to show you
+
+223
+00:13:52,000 --> 00:13:53,000
+我们有一些输出元数据。
+is the LangChain Evaluation Platform.
+
+224
+00:13:54,000 --> 00:13:55,000
+我们在这里添加的另一件事
+This is a way to do everything that we just did
+
+225
+00:13:56,000 --> 00:13:58,000
+是能够将这些示例添加到数据集中。
+in the notebook, but persist it and show it in a UI.
+
+226
+00:13:59,000 --> 00:14:01,000
+因此，如果您记得，当我们创建时
+And so let's check it out.
+
+227
+00:14:02,000 --> 00:14:03,000
+那些示例数据集在开始时，
+Here we can see that we have a session.
+
+228
+00:14:04,000 --> 00:14:05,000
+我们部分手动创建，
+We called it Deep Learning AI.
+
+229
+00:14:05,000 --> 00:14:07,000
+部分使用语言模型。
+And we can see here that we've actually persisted
+
+230
+00:14:08,000 --> 00:14:09,000
+在这里，我们可以通过单击此小按钮将其添加到数据集中，
+all the runs that we ran in the notebook.
+
+231
+00:14:10,000 --> 00:14:11,000
+现在我们有输入查询
+And so this is a good way to track the inputs and outputs
+
+232
+00:14:12,000 --> 00:14:13,000
+和输出结果。
+at a high level, but it's also a really good way
+
+233
+00:14:14,000 --> 00:14:15,000
+因此，我们可以创建一个数据集。
+to see what exactly is going on underneath.
+
+234
+00:14:20,000 --> 00:14:22,000
+我们可以称其为深度学习。
+So this is the same information that was printed out
+
+235
+00:14:25,000 --> 00:14:26,000
+然后我们可以开始添加示例
+in the notebook when we turned on debug mode,
+
+236
+00:14:27,000 --> 00:14:28,000
+到这个数据集中。
+but it's just visualized in a UI
+
+237
+00:14:29,000 --> 00:14:30,000
+因此，回到最初的事情
+in a little bit of a nicer way.
+
+238
+00:14:31,000 --> 00:14:32,000
+我们在课程开始时解决的问题，
+And so we can see the inputs to the chain
+
+239
+00:14:32,000 --> 00:14:34,000
+我们需要创建这些数据集
+and the outputs to the chain at each step.
+
+240
+00:14:35,000 --> 00:14:36,000
+以便我们可以进行评估。
+And then we can click further and further down
+
+241
+00:14:37,000 --> 00:14:38,000
+这是一种非常好的方式
+into the chain and see more and more information
+
+242
+00:14:39,000 --> 00:14:40,000
+只是在后台运行。
+ 
+about what is actually getting passed in.
+
+243
+00:14:41,000 --> 00:14:42,000
+随着时间的推移，不断添加示例数据集
+And so if we go all the way down to the bottom,
+
+244
+00:14:43,000 --> 00:14:44,000
+开始建立这些示例
+we can now see what's getting passed
+
+245
+00:14:45,000 --> 00:14:46,000
+您可以开始用于评估的示例
+exactly to the chat model.
+
+246
+00:14:46,000 --> 00:15:06,000
+并启动评估的飞轮。
+We've got the system message here.

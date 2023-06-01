@@ -1,0 +1,1262 @@
+1
+00:00:00,000 --> 00:00:08,720
+在第一课中，我们将涵盖模型、提示和解析器。
+In lesson one, we'll be covering models, prompts, and parsers.
+
+2
+00:00:08,720 --> 00:00:13,320
+因此，模型是指支撑许多内容的语言模型。
+So models refers to the language models underpinning a lot of it.
+
+3
+00:00:13,320 --> 00:00:18,680
+提示是指创建输入以传递到模型的样式。
+Prompts refers to the style of creating inputs to pass into the models.
+
+4
+00:00:18,680 --> 00:00:20,400
+然后解析器位于相反的端点。
+And then parsers is on the opposite end.
+
+5
+00:00:20,400 --> 00:00:24,360
+它涉及将这些模型的输出解析为更结构化的格式，以便您可以在下游执行操作。
+It involves taking the output of these models and parsing it into a more
+
+6
+00:00:24,360 --> 00:00:27,360
+因此，当您使用llm构建应用程序时，
+structured format so that you can do things downstream with it.
+
+7
+00:00:27,360 --> 00:00:30,640
+它们通常是可重用的模型。
+So when you build a application using an llm,
+
+8
+00:00:30,640 --> 00:00:32,600
+我们反复提示模型，
+they'll often be reusable models.
+
+9
+00:00:32,600 --> 00:00:34,160
+解析输出，因此Lanchain提供了一组易于使用的抽象来执行此类操作。
+We repeatedly prompt a model,
+
+10
+00:00:34,160 --> 00:00:36,520
+因此，让我们开始看一下模型、提示和解析器。
+parses outputs, and so Lanchain gives
+
+11
+00:00:36,520 --> 00:00:39,760
+因此，为了开始，
+an easy set of abstractions to do this type of operation.
+
+12
+00:00:39,760 --> 00:00:44,640
+这里有一些起始代码。
+So with that, let's jump in and take a look at models, prompts, and parsers.
+
+13
+00:00:44,640 --> 00:00:46,160
+我要导入OS，
+So to get started,
+
+14
+00:00:46,160 --> 00:00:47,640
+导入OpenAI，并加载我的OpenAI秘钥。
+here's a little bit of starter code.
+
+15
+00:00:47,640 --> 00:00:48,840
+OpenAI库已经安装在
+I'm going to import OS,
+
+16
+00:00:48,840 --> 00:00:53,240
+我的Jupyter笔记本环境中，因此如果您在本地运行此代码，
+import OpenAI, and load my OpenAI secret key.
+
+17
+00:00:53,240 --> 00:00:56,400
+并且您尚未安装OpenAI，
+The OpenAI library is already installed in
+
+18
+00:00:56,400 --> 00:00:59,920
+您可能需要运行它。
+my Jupyter notebook environment so if you're running this locally,
+
+19
+00:00:59,920 --> 00:01:01,960
+BangPip install OpenAI，但我不会在这里这样做。
+and you don't have OpenAI installed yet,
+
+20
+00:01:01,960 --> 00:01:04,000
+然后这是一个辅助函数。
+you might need to run that.
+
+21
+00:01:04,000 --> 00:01:06,840
+这实际上与您可能在
+BangPip install OpenAI, but I'm not going to do that here.
+
+22
+00:01:06,840 --> 00:01:08,720
+ChatGPT提示工程师开发者课程中看到的辅助函数非常相似，
+And then here's a helper function.
+
+23
+00:01:08,720 --> 00:01:10,280
+所以使用这个辅助函数，
+This is actually, um,
+
+24
+00:01:10,280 --> 00:01:13,960
+您可以说get completion on，
+very similar to the helper function that you might have seen in
+
+25
+00:01:13,960 --> 00:01:17,240
+什么是1加1，这将调用ChatGPT或技术上的模型，
+the chatGPT prompt engineering for developers course
+
+26
+00:01:17,240 --> 00:01:20,360
+GPT 3.5 Turbo，以便您可以得到这样的答案。
+that I offered together with OpenAI's user forfeit.
+
+27
+00:01:20,360 --> 00:01:22,160
+因此，为了激发模型提示和解析器的线链抽象，
+And so with this helper function,
+
+28
+00:01:22,160 --> 00:01:25,200
+让我们假设您收到一封来自客户的电子邮件，该电子邮件不是英语。
+you can say get completion on,
+
+29
+00:01:25,200 --> 00:01:31,120
+为了确保这是可访问的，我将使用英语海盗语言。
+um, what is 1 plus 1 and this will call chatGPT or technically the model,
+
+30
+00:01:31,120 --> 00:01:35,400
+当客户说R时，
+ 
+GPT 3.5 Turbo to give you an answer back like this.
+
+31
+00:01:57,120 --> 00:02:02,280
+我会因为搅拌机盖子飞出去，把我的厨房墙壁弄得满是果汁而感到愤怒。
+Now, to motivate the line chain abstractions for model prompts and parsers,
+
+32
+00:02:02,280 --> 00:02:06,120
+更糟糕的是，保修不包括清洁厨房的费用。
+um, let's say you get an email from a customer in a language other than English.
+
+33
+00:02:06,120 --> 00:02:08,000
+我现在需要你的帮助，伙计。
+Um, in order to make sure this is accessible,
+
+34
+00:02:08,000 --> 00:02:12,400
+所以我们将要做的是请求这个LLM以平静和尊重的口吻将文本翻译成美式英语。
+the other language I'm going to use is the English pirate language.
+
+35
+00:02:12,400 --> 00:02:18,080
+所以我将把风格设置为平静和尊重的美式英语。
+When the customer says, R,
+
+36
+00:02:18,080 --> 00:02:22,520
+为了实现这一点，我将使用一个f字符串来指定提示和指令。
+I'd be fuming that me blender lid flew off and splatted my kitchen walls with smoothie.
+
+37
+00:02:22,520 --> 00:02:26,080
+如果你之前看过一些提示，我将使用一个f字符串来指定提示和指令。
+And to make matters worse, the warranty don't cover the cost of cleaning up me kitchen.
+
+38
+00:02:26,080 --> 00:02:29,080
+我将指定用三个反引号括起来的文本翻译成指定的风格。
+I need your help right now, matey.
+
+39
+00:02:29,080 --> 00:02:33,040
+然后插入这两种风格。
+And so what we will do is ask this LLM to
+
+40
+00:02:33,040 --> 00:02:38,160
+这样就生成了一个提示，说要翻译文本等等。
+translate the text to American English in a calm and respectful tone.
+
+41
+00:02:38,160 --> 00:02:39,880
+我鼓励你暂停视频并运行代码，尝试修改提示以查看是否可以获得不同的输出。
+So I'm going to set style to American English in a calm and respectful tone.
+
+42
+00:02:39,880 --> 00:02:46,200
+然后，你可以提示大型语言模型以获得响应。
+And so in order to actually accomplish this,
+
+43
+00:02:46,200 --> 00:02:49,840
+让我们看看响应是什么。
+if you've seen a little bit of prompting before,
+
+44
+00:03:04,320 --> 00:03:07,880
+说将英语海盗的消息翻译成这个非常礼貌的语气。
+I'm going to specify the prompt using an f-string with the instructions,
+
+45
+00:03:07,880 --> 00:03:10,680
+我真的很沮丧，因为我的搅拌机盖子飞了出去，
+translate the text that is delimited by triple backticks into style that is style.
+
+46
+00:03:10,680 --> 00:03:13,480
+把我的厨房墙壁弄得满是果汁等等。
+And then plug in these two styles.
+
+47
+00:03:13,480 --> 00:03:18,120
+嗯，我现在真的需要你的帮助，我的朋友。听起来非常好。
+And so this generates a prompt that says translate the text and so on.
+
+48
+00:03:18,120 --> 00:03:23,160
+因此，如果你有不同语言的不同客户撰写评论，
+I encourage you to pause the video and run the code and also
+
+49
+00:03:23,160 --> 00:03:26,880
+不仅仅是英语海盗，还有法语、德语、日语等等，
+try modifying the prompt to see if you can get a different output.
+
+50
+00:03:26,880 --> 00:03:29,800
+你可以想象需要生成一整个提示序列来生成这样的翻译。
+You can then, um,
+
+51
+00:03:29,800 --> 00:03:33,920
+让我们看看如何使用Lang chain更方便地完成这项工作。
+prompt the large language model to get a response.
+
+52
+00:03:33,920 --> 00:03:39,360
+我将导入chat open AI。这是Lang chain对chat GPT API端点的抽象。
+Let's see what the response is.
+
+53
+00:03:39,360 --> 00:03:44,360
+因此，如果我设置chat等于chat open AI并查看chat是什么，
+Says translated the English pirates message into this very polite,
+
+54
+00:03:44,360 --> 00:03:49,320
+它将创建这个对象，使用chat GPT模型，也称为GPT 3.5 turbo。
+I'm really frustrated that my blender lid flew off and made
+
+55
+00:03:49,320 --> 00:03:53,840
+当我构建应用程序时，
+ 
+a mess of my kitchen walls with smoothie and so on.
+
+56
+00:04:04,560 --> 00:04:09,560
+我经常做的一件事是将温度参数设置为0。
+Um, I could really use your help right now my friend. That sounds very nice.
+
+57
+00:04:09,560 --> 00:04:11,800
+所以默认温度为0.7。
+So if you have different customers writing reviews in different languages,
+
+58
+00:04:11,800 --> 00:04:20,040
+但让我重新设置温度为0.0。
+not just English pirate, but French, German, Japanese, and so on,
+
+59
+00:04:20,040 --> 00:04:25,400
+现在将温度设置为0，以使我们输出的随机性稍微减少一些。
+you can imagine having to generate
+
+60
+00:04:26,800 --> 00:04:30,960
+现在让我按如下方式定义模板字符串。
+a whole sequence of prompts to generate such translations.
+
+61
+00:04:30,960 --> 00:04:35,000
+将由三个向量分隔的文本翻译成样式。
+Let's look at how we can do this in a more convenient way using Lang chain.
+
+62
+00:04:35,000 --> 00:04:36,800
+然后这里是文本。
+I'm going to import chat open AI.
+
+63
+00:04:36,800 --> 00:04:40,320
+为了反复重用这个模板，
+This is Lang chain's abstraction for the chat GPT API endpoint.
+
+64
+00:04:40,320 --> 00:04:46,200
+让我们导入Lang chain的聊天提示模板。
+And so if I then set chat equals chat open AI and look at what chat is,
+
+65
+00:04:46,200 --> 00:04:54,840
+然后让我使用我们刚刚编写的模板字符串创建一个提示模板。
+it creates this object, um,
+
+66
+00:04:54,840 --> 00:05:01,560
+从提示模板中，
+as follows that uses the chat GPT model,
+
+67
+00:05:01,560 --> 00:05:06,120
+你实际上可以提取原始提示，并意识到
+which is also called GPT 3.5 turbo.
+
+68
+00:05:06,120 --> 00:05:10,520
+这个提示有两个输入变量，样式和文本，
+When I'm building applications,
+
+69
+00:05:10,520 --> 00:05:16,040
+这些用花括号表示。
+one thing I will often do is set the temperature parameter to be equal to 0.
+
+70
+00:05:16,040 --> 00:05:20,200
+这里也是我们指定的原始模板。
+So the default temperature is 0.7.
+
+71
+00:05:20,200 --> 00:05:22,760
+事实上，如果我打印出来，
+But let me actually redo that with temperature equals 0.0.
+
+72
+00:05:22,760 --> 00:05:27,800
+它意识到它有两个输入变量，样式和文本。
+And now the temperature is set to 0 to make us output a little bit less random.
+
+73
+00:05:27,800 --> 00:05:30,200
+现在让我们指定样式。
+And now let me define the template string as follows.
+
+74
+00:05:30,200 --> 00:05:31,960
+这是我想要的样式，
+Translate the text delimited by triple vectors into style that is style.
+
+75
+00:05:31,960 --> 00:05:33,800
+将客户消息翻译成该样式。
+And then here's the text.
+
+76
+00:05:33,800 --> 00:05:36,320
+所以我要称之为客户样式。
+And to repeatedly reuse this template,
+
+77
+00:05:36,320 --> 00:05:44,120
+这是我之前的同一个客户电子邮件。
+let's import Lang chain's chat prompt template.
+
+78
+00:05:44,120 --> 00:05:50,960
+现在，如果我创建
+And then let me create a prompt template using that template string that we just wrote above.
+
+79
+00:05:50,960 --> 00:05:55,520
+客户消息，这将生成提示，
+From the prompt template,
+
+80
+00:05:55,520 --> 00:05:59,560
+并将在一分钟内传递给大型语言模型以获得响应。
+you can actually extract the original prompt and it realizes that
+
+81
+00:05:59,560 --> 00:06:01,880
+所以如果你想看看类型，
+this prompt has two input variables, the style and the text,
+
+82
+00:06:01,880 --> 00:06:04,400
+客户消息实际上是一个列表。
+which were, um, shown here with the curly braces.
+
+83
+00:06:04,400 --> 00:06:10,760
+如果你看一下列表的第一个元素，
+And here is the original template as well that we had specified.
+
+84
+00:06:10,760 --> 00:06:16,880
+这更或多或少是你期望它创建的提示。
+In fact, if I print this out,
+
+85
+00:06:16,880 --> 00:06:20,440
+最后，让我们将此提示传递给LLM。
+um, it realizes it has two input variables, style and text.
+
+86
+00:06:20,440 --> 00:06:22,560
+所以我要调用聊天，
+Now let's specify the style.
+
+87
+00:06:22,560 --> 00:06:25,040
+我们之前设置的，
+This is a style that I want the, uh,
+
+88
+00:06:25,040 --> 00:06:28,480
+作为OpenAI聊天GPT端点的参考。
+customer message to be translated to.
+
+89
+00:06:28,480 --> 00:06:36,320
+如果我们打印出客户响应的内容，
+So I'm gonna call this customer style.
+
+90
+00:06:36,320 --> 00:06:38,800
+那么它会给你返回，um，
+ 
+And, uh, here's my same customer email as before.
+
+91
+00:06:38,800 --> 00:06:45,000
+这段文本是从英语海盗语翻译成礼貌的美式英语。
+And now, if I create
+
+92
+00:06:45,000 --> 00:06:47,840
+当然，你可以想象其他使用情况，
+customer messages, this will generate the prompt,
+
+93
+00:06:47,840 --> 00:06:53,400
+客户的电子邮件是其他语言，这也可以用来
+and will pass this a large language model in a minute to get a response.
+
+94
+00:06:53,400 --> 00:06:58,400
+翻译消息，以便英语为母语的人理解并回复。
+So if you want to look at the types,
+
+95
+00:06:58,400 --> 00:07:02,280
+我鼓励你暂停视频并运行代码，还可以
+the customer message is actually a list.
+
+96
+00:07:02,280 --> 00:07:06,280
+尝试修改提示，看看是否可以获得不同的输出。
+And, um, if you look at the first element of the list,
+
+97
+00:07:06,280 --> 00:07:09,240
+现在，让我们希望我们的客服代表
+this is more or less that prompt that you would expect this to be creating.
+
+98
+00:07:09,240 --> 00:07:11,800
+用他们的原始语言回复客户。
+Lastly, let's pass this prompt to the LLM.
+
+99
+00:07:11,800 --> 00:07:16,160
+所以，让我们假设英语为母语的客服代表写了这个并说，
+So I'm gonna call chat,
+
+100
+00:07:16,160 --> 00:07:18,240
+嘿，客户，保修不包括，
+which we had set earlier, um,
+
+101
+00:07:18,240 --> 00:07:20,280
+你的厨房清洁费，因为这是你的错，
+as a reference to the OpenAI chat GPT endpoint.
+
+102
+00:07:20,280 --> 00:07:23,520
+你忘记盖上盖子，误用了你的搅拌机。
+And if we print out the customer responses content,
+
+103
+00:07:23,520 --> 00:07:24,920
+很遗憾，再见。
+then it gives you back, um,
+
+104
+00:07:24,920 --> 00:07:26,320
+不是很礼貌的消息，
+this text translated from English Pirate to polite American English.
+
+105
+00:07:26,320 --> 00:07:31,560
+但是，让我们假设这是客服代表想要的。
+And of course, you can imagine other use cases where
+
+106
+00:07:31,720 --> 00:07:36,040
+我们将指定
+the customer emails are in other languages and this too can be used to
+
+107
+00:07:36,040 --> 00:07:39,480
+服务消息将被翻译成这种海盗风格。
+translate the messages for an English-speaking to understand and reply to.
+
+108
+00:07:39,480 --> 00:07:45,120
+所以我们希望它以礼貌的语气用英语海盗语说话。
+I encourage you to pause the video and run the code and also
+
+109
+00:07:45,120 --> 00:07:48,080
+因为我们之前创建了那个提示模板，
+try modifying the prompt to see if you can get a different output.
+
+110
+00:07:48,080 --> 00:07:52,520
+很酷的是我们现在可以重复使用那个提示模板并指定
+Now, let's hope our customer service agent
+
+111
+00:07:52,520 --> 00:07:58,240
+我们想要的输出样式是这个服务风格的海盗和这个服务回复的文本。
+reply to the customer in their original language.
+
+112
+00:07:58,240 --> 00:08:01,240
+如果我们这样做，
+So let's say English-speaking customer service agent writes this and say,
+
+113
+00:08:01,800 --> 00:08:05,200
+那就是提示。
+hey there customer, warranty does not cover,
+
+114
+00:08:05,760 --> 00:08:09,160
+如果我们提示，
+clean expenses for your kitchen because it's your fault,
+
+115
+00:08:09,160 --> 00:08:13,040
+聊天GPT，这是它给我们的回应。
+that you misused your blender by forgetting to put on the lid.
+
+116
+00:08:13,040 --> 00:08:18,080
+啊，那里的伙计，我必须友好地告诉你，保修不包括
+Tough luck, see ya.
+
+117
+00:08:18,080 --> 00:08:21,200
+你的厨房清洁费等等。
+Not a very polite message,
+
+118
+00:08:21,200 --> 00:08:23,520
+是的，很遗憾，再见我的心爱的。
+but, um, let's say this is what a customer service agent wants.
+
+119
+00:08:23,520 --> 00:08:27,600
+所以你可能会想知道为什么我们使用提示模板而不是，
+We are going to specify that
+
+120
+00:08:27,600 --> 00:08:28,920
+你知道，只是一个F字符串？
+the service message is going to be translated to this pirate style.
+
+121
+00:08:28,920 --> 00:08:32,480
+答案是，随着你构建复杂的应用程序，
+So we want it to be in a polite tone that speaks in English Pirate.
+
+122
+00:08:32,480 --> 00:08:35,360
+提示可能会非常长和详细。
+And because we previously created that prompt template,
+
+123
+00:08:35,360 --> 00:08:42,440
+因此，提示模板是一个有用的抽象，可以帮助您在可以重复使用好的提示时重复使用它们。
+ 
+the cool thing is we can now reuse that prompt template and specify that
+
+124
+00:08:42,440 --> 00:08:46,760
+嗯，这是一个相对较长的提示示例，用于在线学习应用程序中对学生提交的作业进行评分。
+the output style we want is this service style pirate and the text is this service reply.
+
+125
+00:08:46,760 --> 00:08:52,000
+像这样的提示可能会很长，您可以要求LLM首先解决问题，然后以特定格式输出。
+And if we do that,
+
+126
+00:08:52,000 --> 00:08:57,560
+将其包装在Lanchain提示中可以更轻松地重用此类提示。
+that's the prompt.
+
+127
+00:08:57,560 --> 00:09:02,600
+此外，您稍后会看到Lanchain为一些常见操作提供提示，
+And if we prompt, um,
+
+128
+00:09:02,600 --> 00:09:08,720
+例如摘要或问题回答或连接到SQL数据库，
+chat GPT, this is a response it gives us back.
+
+129
+00:09:08,720 --> 00:09:14,640
+或连接到不同的API。
+Ahoy there matey, I must kindly inform you that the warranty be not covering
+
+130
+00:09:14,640 --> 00:09:20,520
+因此，通过使用一些Lanchain内置的提示，
+the expenses or cleaning your galley and so on.
+
+131
+00:09:20,520 --> 00:09:22,280
+您可以快速使应用程序运行而无需自己设计提示。
+Aye tough luck, farewell me hearty.
+
+132
+00:09:22,280 --> 00:09:25,880
+Lanchain提示库的另一个方面是它还支持输出解析，
+So you might be wondering why are we using prompt templates instead of,
+
+133
+00:09:25,880 --> 00:09:29,640
+我们将在一分钟内介绍。
+you know, just an F-string?
+
+134
+00:09:29,640 --> 00:09:31,880
+但是，当您使用LLM构建复杂应用程序时，
+The answer is that as you build sophisticated applications,
+
+135
+00:09:31,880 --> 00:09:37,840
+通常会指示LLM以特定格式生成其输出，
+prompts can be quite long and detailed.
+
+136
+00:09:37,840 --> 00:09:40,600
+例如使用特定关键字。
+And so prompt templates are a useful abstraction to help you reuse good prompts when you can.
+
+137
+00:09:40,600 --> 00:09:42,920
+左侧的示例说明了使用LLM执行一种称为思维链推理的东西，
+Um, this is an example of a relatively long prompt to
+
+138
+00:09:42,920 --> 00:09:46,840
+使用React框架。
+grade a student's submission for an online learning application.
+
+139
+00:09:46,840 --> 00:09:52,600
+但是不要担心技术细节，
+And a prompt like this can be quite long in which you can ask the LLM to first solve
+
+140
+00:09:52,600 --> 00:09:55,240
+但关键是LLM正在思考什么，
+the problem and then have the output in a certain format and output in a certain format.
+
+141
+00:09:55,240 --> 00:10:00,680
+因为给LLM思考的空间，
+And wrapping this in a Lanchain prompt makes it easier to reuse a prompt like this.
+
+142
+00:10:00,680 --> 00:10:06,160
+它通常可以得出更准确的结论。
+Also, you see later that Lanchain provides prompts for some common operations,
+
+143
+00:10:06,160 --> 00:10:09,280
+然后将动作作为关键字执行特定操作，
+such as summarization or question answering or connecting to SQL databases,
+
+144
+00:10:09,280 --> 00:10:15,560
+然后观察以显示从该操作中学到的内容，依此类推。
+or connecting to different APIs.
+
+145
+00:10:15,560 --> 00:10:18,160
+如果您有一个提示，指示LLM使用这些特定关键字，
+And so by using some of Lanchain's built-in prompts,
+
+146
+00:10:18,160 --> 00:10:21,240
+思考，动作和观察，
+you can quickly get an application working without needing to,
+
+147
+00:10:21,240 --> 00:10:25,520
+那么这个提示可以与解析器配合使用，
+um, engineer your own prompts.
+
+148
+00:10:25,520 --> 00:10:31,240
+以提取已标记为这些特定关键字的文本。
+One other aspect of Lanchain's prompt libraries is that,
+
+149
+00:10:31,240 --> 00:10:37,480
+因此，这一起为指定LLM的输入提供了非常好的抽象，
+it also supports output parsing,
+
+150
+00:10:37,480 --> 00:10:39,920
+然后还可以使用解析器正确解释LLM给出的输出。
+ 
+which we'll get to in a minute.
+
+151
+00:11:01,040 --> 00:11:08,680
+因此，让我们回到使用Langchain的输出解析器的示例。
+But when you're building a complex application using an LLM,
+
+152
+00:11:08,680 --> 00:11:14,160
+在这个例子中，让我们看一下如何使用LLM输出JSON，
+you often instruct the LLM to generate its output in a certain format,
+
+153
+00:11:14,160 --> 00:11:17,280
+并使用Langchain解析该输出。
+such as using specific keywords.
+
+154
+00:11:17,280 --> 00:11:23,440
+我将使用一个产品评论的运行示例来提取信息并以JSON格式格式化输出。
+This example on the left illustrates using an LLM to carry out something called
+
+155
+00:11:23,440 --> 00:11:28,800
+这是一个期望的输出示例。
+chain of thought reasoning using a framework called the React framework.
+
+156
+00:11:28,800 --> 00:11:33,920
+这实际上是一个Python字典，
+But don't worry about the technical details,
+
+157
+00:11:33,920 --> 00:11:36,720
+其中产品是否为GIF，
+but the keys of that is that the thought is what the LLM is thinking,
+
+158
+00:11:36,720 --> 00:11:38,960
+大规模的假，交付所需的天数为五天，
+because by giving an LLM space to think,
+
+159
+00:11:38,960 --> 00:11:41,840
+价格值相当实惠。
+it can often get some more accurate conclusions.
+
+160
+00:11:41,840 --> 00:11:44,440
+这是一个期望的输出示例。
+Then action as a keyword to carry the specific action,
+
+161
+00:11:44,440 --> 00:11:48,280
+以下是客户评论以及尝试获得JSON输出的模板。
+and then observation to show what it learned from that action, and so on.
+
+162
+00:11:48,280 --> 00:11:50,720
+以下是一个客户评论。
+And if you have a prompt that instructs the LLM to use these specific keywords,
+
+163
+00:11:50,720 --> 00:11:57,160
+它说，睡眠吹风机非常惊人。
+thought, action, and observation,
+
+164
+00:11:57,160 --> 00:11:58,520
+它有四个设置，蜡烛吹风机，
+then this prompt can be coupled with a parser to extract out
+
+165
+00:11:58,520 --> 00:12:00,600
+温柔的微风，风城和龙卷风。
+the text that has been tagged with these specific keywords.
+
+166
+00:12:00,600 --> 00:12:02,480
+它在两天内到达，正好是我妻子的周年礼物。
+And so that together gives a very nice abstraction to specify the input to an LLM,
+
+167
+00:12:02,480 --> 00:12:04,800
+我认为我妻子非常喜欢它，她一言不发。
+and then also have a parser correctly interpret the output that the LLM gives.
+
+168
+00:12:04,800 --> 00:12:08,640
+到目前为止，我是唯一使用它的人，等等。
+And so with that, let's return to see an example of an output parser using Langchain.
+
+169
+00:12:08,640 --> 00:12:15,520
+以下是评论模板。
+In this example, let's take a look at how you can have an LLM output JSON,
+
+170
+00:12:15,520 --> 00:12:18,080
+对于以下文本，提取以下信息，
+and use Langchain to parse that output.
+
+171
+00:12:18,080 --> 00:12:20,040
+指定这是一个GIF。
+And the running example that I'll use will be to extract information from
+
+172
+00:12:20,040 --> 00:12:21,680
+在这种情况下，是的，
+a product review and format that output in a JSON format.
+
+173
+00:12:21,680 --> 00:12:22,840
+因为这是一个GIF。
+So here's an example of how you would like the output to be formatted.
+
+174
+00:12:22,840 --> 00:12:25,640
+还有交付天数。
+Technically, this is a Python dictionary,
+
+175
+00:12:25,640 --> 00:12:27,160
+需要多长时间才能交付？
+where whether or not the product is a GIF,
+
+176
+00:12:27,160 --> 00:12:29,640
+看起来在这种情况下，它在两天内到达。
+massive false, the number of days it took to deliver it was five,
+
+177
+00:12:29,640 --> 00:12:32,040
+还有，价格值是多少？
+and the price value was pretty affordable.
+
+178
+00:12:32,040 --> 00:12:35,640
+比睡眠吹风机稍微贵一些，等等。
+So this is one example of a desired output.
+
+179
+00:12:35,640 --> 00:12:42,920
+因此，评论模板要求LLM以客户评论作为输入，
+Here is an example of,
+
+180
+00:12:42,920 --> 00:12:45,920
+并提取这三个字段，
+um, customer review as well as a template to try to get to that JSON output.
+
+181
+00:12:45,920 --> 00:12:48,360
+然后将输出格式化为JSON，
+So here's a customer review.
+
+182
+00:12:48,360 --> 00:12:52,000
+使用以下键。
+It says, the sleep blower is pretty amazing.
+
+183
+00:12:52,000 --> 00:12:56,400
+好的。
+It has four settings, candle blower,
+
+184
+00:12:56,400 --> 00:13:01,080
+以下是如何在Langchain中包装它。
+ 
+gentle breeze, windy city, and tornado.
+
+185
+00:13:01,080 --> 00:13:02,920
+让我们导入聊天提示模板。
+It arrived in two days just in time for my wife's anniversary present.
+
+186
+00:13:02,920 --> 00:13:04,760
+实际上我们之前已经导入过了。
+I think my wife liked it so much she was speechless.
+
+187
+00:13:04,760 --> 00:13:06,520
+所以从技术上讲，这一行是多余的，
+So far, I've been the only one using it, and so on.
+
+188
+00:13:06,520 --> 00:13:08,360
+但我会再次导入它，
+Um, and here's a review template.
+
+189
+00:13:08,360 --> 00:13:10,680
+然后从上面的评论模板创建提示模板。
+For the following text, extract the following information,
+
+190
+00:13:10,680 --> 00:13:16,040
+这是提示模板。
+specify was this a GIF.
+
+191
+00:13:16,040 --> 00:13:19,480
+现在，类似于我们早期使用提示模板的方式，
+So in this case, it would be yes,
+
+192
+00:13:19,480 --> 00:13:23,680
+让我们创建要传递给OpenAI端点的消息。
+because this is a GIF.
+
+193
+00:13:23,680 --> 00:13:32,000
+创建OpenAI端点，调用该端点，然后让我们打印出响应。
+Um, and also delivery days.
+
+194
+00:13:32,000 --> 00:13:34,760
+我鼓励您暂停视频并运行代码。
+How long did it take to deliver?
+
+195
+00:13:34,760 --> 00:13:39,000
+然后就是这样了。
+It looks like in this case, it arrived in two days.
+
+196
+00:13:39,000 --> 00:13:42,960
+它说GIF为true，交货时间为两天，
+And, um, what's the price value?
+
+197
+00:13:44,440 --> 00:13:46,520
+价格值看起来也相当准确。
+You know, slightly more expensive than the sleep blowers, and so on.
+
+198
+00:13:46,520 --> 00:13:49,000
+但请注意，如果我们检查响应的类型，
+So the review template asks the LLM to take as input a customer review,
+
+199
+00:13:49,000 --> 00:13:52,920
+这实际上是一个字符串。
+and extract these three fields,
+
+200
+00:13:52,920 --> 00:14:02,280
+看起来像JSON，看起来有键值对，
+and then format the output as JSON,
+
+201
+00:14:02,280 --> 00:14:04,040
+但它实际上不是一个字典。
+um, with the following keys.
+
+202
+00:14:04,040 --> 00:14:07,960
+这只是一个很长的字符串。
+All right.
+
+203
+00:14:07,960 --> 00:14:09,480
+所以我真正想做的是去响应内容，
+So here's how you can wrap this in line chain.
+
+204
+00:14:09,480 --> 00:14:11,920
+并从GIF键中获取值，这应该是true。
+Let's import the chat prompt template.
+
+205
+00:14:11,920 --> 00:14:14,720
+但如果我运行这个，这应该会生成一个错误，因为，嗯，
+We'd actually imported this already earlier.
+
+206
+00:14:14,720 --> 00:14:17,560
+这实际上是一个字符串，这不是一个Python字典。
+So technically, this line is redundant,
+
+207
+00:14:17,560 --> 00:14:21,080
+所以让我们看看如何使用Langchain的解析器来做到这一点。
+but I'll just import it again,
+
+208
+00:14:21,080 --> 00:14:24,040
+我将从Langchain导入响应模式和结构化输出解析器。
+and then have the prompt templates, um,
+
+209
+00:14:24,040 --> 00:14:27,680
+并且，我将告诉它我想要解析什么，通过指定这些响应模式。
+created from the review template up on top.
+
+210
+00:14:27,680 --> 00:14:31,200
+所以GIF模式被命名为GIF，
+And so here's the prompt template.
+
+211
+00:14:31,200 --> 00:14:39,560
+这是描述。购买的物品是否作为礼物送给别人？回答true或yes，如果不是或未知，则为false等等。
+And now, similar to our early usage of a prompt template,
+
+212
+00:14:39,560 --> 00:14:46,400
+所以我有一个GIF模式，
+let's create the messages to pass to the OpenAI, uh, endpoint.
+
+213
+00:14:46,400 --> 00:14:49,080
+交货日期模式，价格值模式，
+Create the OpenAI endpoint,
+
+214
+00:14:49,080 --> 00:14:50,200
+然后让我们将它们全部放入列表中。
+call that endpoint, and then let's print out the response.
+
+215
+00:14:50,200 --> 00:14:52,720
+现在我已经指定了这些模式，
+ 
+I encourage you to pause the video and run the code.
+
+216
+00:15:08,760 --> 00:15:12,880
+Langchain实际上可以直接给你提示，通过输出解析器告诉你要发送给LLM的指令。
+And there it is.
+
+217
+00:15:12,880 --> 00:15:20,080
+通过输出解析器告诉你要发送给LLM的指令，这样，如果我要打印格式指令，
+It says GIF is true, delivery days is two,
+
+218
+00:15:20,080 --> 00:15:24,320
+她有一套非常精确的LLM格式指令，可以生成输出，输出解析器可以处理。
+and the price value also looks pretty accurate.
+
+219
+00:15:24,840 --> 00:15:29,200
+所以这是新的评论模板。
+Um, but note that if we check the type of the response,
+
+220
+00:15:29,200 --> 00:15:33,640
+评论模板包括Langchain生成的格式指令，因此也可以从评论模板中创建提示，
+this is actually a string.
+
+221
+00:15:33,880 --> 00:15:37,400
+然后创建将传递到OpenAI端点的消息。
+So it looks like JSON and looks like it has key value pairs,
+
+222
+00:15:37,400 --> 00:15:41,440
+如果您想，您可以查看实际提示，
+but it's actually not a dictionary.
+
+223
+00:15:41,440 --> 00:15:50,720
+它会告诉您如何提取字段，GIF、交货天数、价格值。
+This is just one long string.
+
+224
+00:15:50,720 --> 00:15:57,960
+这是文本，这是格式化指令。
+So what I'd really like to do is go to the response content,
+
+225
+00:15:57,960 --> 00:16:02,240
+最后，如果我们调用OpenAI端点，
+and get the value from the GIF key, which should be true.
+
+226
+00:16:02,240 --> 00:16:07,440
+让我们看看我们得到了什么响应。
+But I run this, this should generate an error because, well,
+
+227
+00:16:07,440 --> 00:16:10,400
+现在是这样的。
+this is actually a string, this is not a Python dictionary.
+
+228
+00:16:10,400 --> 00:16:15,400
+现在，如果我们使用之前创建的输出解析器，
+So let's see how we would use Langchain's,
+
+229
+00:16:17,400 --> 00:16:25,240
+您可以将其解析为输出字典。
+um, parser in order to do this.
+
+230
+00:16:25,240 --> 00:16:29,120
+我们的打印应该是这样的。
+I'm going to import response schema and structured output parser from Langchain.
+
+231
+00:16:29,120 --> 00:16:32,520
+请注意，这是字典类型，而不是字符串。
+And, um, I'm going to tell it what I wanted to parse by specifying these response schemas.
+
+232
+00:16:33,320 --> 00:16:38,760
+这就是为什么我现在可以提取与GIFs键相关联的值并获得true，
+So the GIF schema is named GIF,
+
+233
+00:16:38,760 --> 00:16:46,040
+或提取与交货天数相关联的值并获得2。
+and here's the description.
+
+234
+00:16:46,040 --> 00:16:49,080
+或者您还可以提取与价格值相关联的值。
+Was the item purchased as a gift for someone else?
+
+235
+00:16:49,080 --> 00:16:57,000
+因此，这是一种巧妙的方法，可以将您的LLM输出解析为Python字典，以使输出在下游处理中更容易使用。
+Uh, answer true or yes,
+
+236
+00:16:57,000 --> 00:17:03,920
+我鼓励您暂停视频并运行代码。
+false if not or unknown, and so on.
+
+237
+00:17:03,920 --> 00:17:08,640
+这就是模型、提示和解析器。
+So have a GIF schema,
+
+238
+00:17:08,640 --> 00:17:10,800
+有了这些工具，希望您能轻松地重用自己的提示模板，
+delivery day schema, price value schema,
+
+239
+00:17:10,800 --> 00:17:14,040
+与您合作的其他人分享提示模板，
+and then let's put all three of them into a list as follows.
+
+240
+00:17:14,040 --> 00:17:20,160
+甚至使用Lanchain内置的提示模板，正如您刚才看到的，
+Now that I've specified the schema for these, um,
+
+241
+00:17:20,160 --> 00:17:25,080
+这是一种巧妙的方法，可以将您的LLM输出解析为Python字典，以使输出在下游处理中更容易使用。
+Langchain can actually give you the prompt itself, uh,
+
+242
+00:17:25,080 --> 00:17:28,440
+我鼓励您暂停视频并运行代码。
+by having the output parser tell you what instructions it wants you to send to the LLM.
+
+243
+00:17:28,440 --> 00:17:31,160
+这就是模型、提示和解析器。
+So if I were to print format instructions,
+
+244
+00:17:31,160 --> 00:17:32,680
+有了这些工具，希望您能轻松地重用自己的提示模板，
+she has a pretty precise set of instructions for the LLM that will cause it to
+
+245
+00:17:32,680 --> 00:17:37,640
+与您合作的其他人分享提示模板，
+generate an output that the output parser can process.
+
+246
+00:17:37,640 --> 00:17:40,280
+甚至使用Lanchain内置的提示模板，正如您刚才看到的，
+ 
+So here's the new review template.
+
+247
+00:17:45,040 --> 00:17:47,920
+通常可以与输出解析器配对使用。
+And the review template includes the format instructions that
+
+248
+00:17:47,920 --> 00:17:53,280
+这样，输入提示可以以特定格式输出，然后解析器将输出暂停以将数据存储在Python字典或其他数据结构中，以便于下游处理。
+Langchain generated and so can create a prompt from the review template too,
+
+249
+00:17:53,280 --> 00:17:57,800
+我希望您在许多应用程序中都能找到这个有用。
+and then create the messages that will pass to the OpenAI endpoint.
+
+250
+00:18:06,080 --> 00:18:10,400
+有了这个，让我们进入下一个视频，看看Lanchain如何帮助您构建更好的聊天机器人或使LLM的聊天更有效，
+If you want, you can take a look at the actual prompt,
+
+251
+00:18:16,400 --> 00:18:36,400
+通过更好地管理它到目前为止所记住的对话。
+which gives you instructions to extract the fields,

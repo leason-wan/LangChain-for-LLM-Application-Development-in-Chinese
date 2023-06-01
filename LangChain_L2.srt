@@ -1,0 +1,880 @@
+1
+00:00:00,000 --> 00:00:18,000
+当你与这些模型交互时，它们自然而然地不会记得你之前说过的话或任何以前的对话，这在构建一些应用程序（如聊天机器人）并希望与它们进行对话时是一个问题。
+When you interact with these models, naturally, they don't remember what you say before or any of the previous conversation, which is an issue when you're building some applications like chatbot and you want to have a conversation with them.
+
+2
+00:00:18,000 --> 00:00:31,000
+因此，在本节中，我们将介绍记忆，即如何记住先前对话的部分并将其馈入语言模型中，以便在与它们交互时具有这种对话流。
+And so in this section, we'll cover memory, which is basically how do you remember previous parts of the conversation and feed that into the language model so that they can have this conversational flow as you're interacting with them.
+
+3
+00:00:31,000 --> 00:00:38,000
+没错。因此，Language Chain提供了多种复杂的选项来管理这些记忆。让我们跳进来看看。
+Yep. So, Language Chain offers multiple sophisticated options for managing these memories. Let's jump in and take a look.
+
+4
+00:00:38,000 --> 00:00:48,000
+因此，让我首先导入我的OpenAI API密钥，然后让我导入我需要的一些工具。
+So, let me start off by importing my OpenAI API key and then let me import a few tools that I'll need.
+
+5
+00:00:48,000 --> 00:00:55,000
+让我们以使用LangChain来管理聊天或聊天机器人对话为记忆的动机示例。
+Let's use as the motivating example for memory, using LangChain to manage a chat or a chatbot conversation.
+
+6
+00:00:55,000 --> 00:01:09,000
+因此，为此，我将将llm设置为OpenAI的聊天界面，温度为零。我将使用内存作为对话缓冲区内存。
+So, to do that, I'm going to set the llm as a chat interface of OpenAI with temperature equals zero. And I'm going to use the memory as a conversation buffer memory.
+
+7
+00:01:09,000 --> 00:01:15,000
+稍后您将看到这意味着什么。我将构建一个对话链。
+And you'll see later what this means. And I'm going to build a conversation chain.
+
+8
+00:01:15,000 --> 00:01:26,000
+同样，在这个短期课程中，Harrison将更深入地探讨LangChain中的链是什么。所以现在不要太担心语法的细节。
+Again, later in this short course, Harrison will dive much more deeply into what exactly is a chain in LangChain. So, don't worry too much about the details of the syntax for now.
+
+9
+00:01:26,000 --> 00:01:36,000
+但是这构建了一个llm。如果我开始交谈，conversation.predict，给出输入。嗨，我的名字是安德鲁。
+But this builds an llm. And if I start to have a conversation, conversation.predict, give the input. Hi, my name is Andrew.
+
+10
+00:01:36,000 --> 00:01:47,000
+让我们看看它说什么。你好，安德鲁，很高兴见到你。对吧？等等。然后让我们说我问它，1加1等于多少？
+Let's see what it says. Hello, Andrew, it's nice to meet you. Right? And so on. And then let's say I ask it, what is one plus one?
+
+11
+00:01:47,000 --> 00:01:55,000
+嗯，1加1等于2。然后再问一遍，你知道我的名字是什么吗？你的名字是安德鲁，正如你之前提到的那样。
+Um, one plus one is two. And then ask it again, you know, what's my name? Your name is Andrew, as you mentioned earlier.
+
+12
+00:01:55,000 --> 00:02:06,000
+嗯，那里有很多讽刺的痕迹。不确定。因此，如果您愿意，可以将此verbose变量更改为true，以查看LangChain实际上正在做什么。
+Hmm, there's a lot of trace of sarcasm there. Not sure. And so if you want, you can change this verbose variable to true to see what LangChain is actually doing.
+
+13
+00:02:06,000 --> 00:02:11,000
+当您运行predict，hi，my name is Andrew时，这是LangChain正在生成的提示。
+When you run predict, hi, my name is Andrew, this is the prompt that LangChain is generating.
+
+14
+00:02:11,000 --> 00:02:16,000
+它说，以下是人类和AI之间友好的对话，AI健谈等等。
+It says, the following is a friendly conversation between a human and an AI, AI is talkative, and so on.
+
+15
+00:02:16,000 --> 00:02:26,000
+因此，这是LangChain生成的提示，以使系统进行希望和友好的对话，并且必须保存对话，这是响应。
+So this is a prompt that LangChain has generated to have the system have a hopeful and friendly conversation, and it has to save the conversation and here's the response.
+
+16
+00:02:26,000 --> 00:02:35,000
+当您在第二和第三部分对话上执行此操作时，它会保留提示如下。
+And when you execute this on the second and third parts of the conversations, it keeps the prompt as follows.
+
+17
+00:02:35,000 --> 00:02:43,000
+请注意，到我说出“我的名字是什么？”这是第三轮，那是我的第三个输入。
+ 
+And notice that by the time I'm uttering, what is my name? This is the third turn, that's my third input.
+
+18
+00:02:43,000 --> 00:02:50,000
+它已将当前对话存储如下。嗨，我的名字是安德鲁，一加一等于多少，等等。
+It has stored the current conversation as follows. Hi, my name is Andrew, what is one plus one, and so on.
+
+19
+00:02:50,000 --> 00:02:57,000
+因此，这个对话的记忆或历史变得越来越长。
+And so this memory or this history of the conversation gets longer and longer.
+
+20
+00:02:57,000 --> 00:03:02,000
+实际上，在顶部，我使用了内存变量来存储内存。
+In fact, up on top, I had used the memory variable to store the memory.
+
+21
+00:03:02,000 --> 00:03:08,000
+因此，如果我要打印memory.buffer，它已经存储了到目前为止的对话。
+So if I were to print memory.buffer, it has stored the conversation so far.
+
+22
+00:03:08,000 --> 00:03:14,000
+您还可以打印出这个，memory.loadMemoryVariables。
+You can also print this out, memory.loadMemoryVariables.
+
+23
+00:03:14,000 --> 00:03:18,000
+这里的花括号实际上是一个空字典。
+The curly braces here is actually an empty dictionary.
+
+24
+00:03:18,000 --> 00:03:25,000
+有一些更高级的功能，您可以使用更复杂的输入，但我们不会在这个短期课程中讨论它们。
+There's some more advanced features that you can use with a more sophisticated input, but we won't talk about them in this short course.
+
+25
+00:03:25,000 --> 00:03:28,000
+所以不要担心为什么这里有一个空的花括号。
+So don't worry about why there's an empty curly braces here.
+
+26
+00:03:28,000 --> 00:03:33,000
+但这就是LangChain到目前为止在对话记忆中记住的一切。
+But this is what LangChain has remembered in the memory of the conversation so far.
+
+27
+00:03:33,000 --> 00:03:38,000
+这只是AI或人类说的一切。
+It's just everything that the AI or that the human has said.
+
+28
+00:03:38,000 --> 00:03:41,000
+我鼓励您暂停视频并运行代码。
+I encourage you to pause the video and run the code.
+
+29
+00:03:41,000 --> 00:03:49,000
+因此，LangChain存储对话的方式是使用这个对话缓冲区内存。
+So the way that LangChain is storing the conversation is with this conversation buffer memory.
+
+30
+00:03:49,000 --> 00:03:55,000
+如果我使用对话缓冲区内存来指定一些输入和输出，
+If I were to use the conversation buffer memory to specify a couple of inputs and outputs,
+
+31
+00:03:55,000 --> 00:03:59,000
+如果您希望明确地这样做，这是添加新内容到内存中的方法。
+this is how you add new things to the memory if you wish to do so explicitly.
+
+32
+00:03:59,000 --> 00:04:03,000
+Memory.saveContext说，嗨，怎么样？
+Memory.saveContext says, hi, what's up?
+
+33
+00:04:03,000 --> 00:04:09,000
+我知道这不是最令人兴奋的对话，但我想举一个简短的例子。
+I know this is not the most exciting conversation, but I wanted to have a short example.
+
+34
+00:04:09,000 --> 00:04:15,000
+嗯，就这样内存的状态。
+Um, and with that, this is what the status of the memory is.
+
+35
+00:04:15,000 --> 00:04:22,000
+再次，让我显示一下内存变量。
+And once again, let me actually show the, uh, memory variables.
+
+36
+00:04:22,000 --> 00:04:29,000
+现在，如果您想向内存添加其他数据，您可以继续保存其他上下文。
+Now, if you want to add additional, um, data to the memory, you can keep on saving additional context.
+
+37
+00:04:29,000 --> 00:04:34,000
+因此，对话继续，没有什么，只是挂着，很酷。
+So conversation goes on, not much, just hanging, cool.
+
+38
+00:04:34,000 --> 00:04:38,000
+如果您打印出内存，您会发现现在有更多的东西。
+And if you print out the memory, you know, there's now more stuff in it.
+
+39
+00:04:38,000 --> 00:04:46,000
+因此，当您使用大型语言模型进行聊天对话时，大型语言模型本身实际上是无状态的。
+So when you use a large language model for a chat conversation, um, the large language model itself is actually stateless.
+
+40
+00:04:46,000 --> 00:04:51,000
+语言模型本身不记得到目前为止的对话。
+The language model itself does not remember the conversation you've had so far.
+
+41
+00:04:51,000 --> 00:04:55,000
+每个交易，每个调用API端点都是独立的。
+And each transaction, each call to the API endpoint is independent.
+
+42
+00:04:55,000 --> 00:05:07,000
+聊天机器人似乎只有记忆，因为通常会提供完整的对话作为上下文，以提供给LLM。
+And chatbots appear to have memory only because there's usually rapid code that provides the full conversation that's been had so far as context to the LLM.
+
+43
+00:05:07,000 --> 00:05:14,000
+因此，内存可以明确地存储到目前为止的术语或话语。
+ 
+And so the memory can store explicitly the terms or the utterances so far.
+
+44
+00:05:14,000 --> 00:05:16,000
+嗨，我叫安德鲁。你好，很高兴认识你等等。
+Hi, my name is Andrew. Hello, it's just nice to meet you and so on.
+
+45
+00:05:16,000 --> 00:05:30,000
+这个内存存储器被用作输入或附加上下文到LLM中，以便它可以生成一个输出，就好像它只是有下一个对话的转折，知道之前说过什么。
+And this memory storage is used as input or additional context to the LLM so that it can generate an output as if it's just having the next conversational turn, knowing what's been said before.
+
+46
+00:05:30,000 --> 00:05:37,000
+随着对话变得越来越长，所需的内存量也变得非常长。
+And as the conversation becomes long, the amounts of memory needed becomes really, really long.
+
+47
+00:05:37,000 --> 00:05:46,000
+因此，将大量的令牌发送到LLM的成本，通常是基于它需要处理的令牌数量而收费，也会变得更加昂贵。
+And thus the cost of sending a lot of tokens to the LLM, which usually charges based on the number of tokens it needs to process will also become more expensive.
+
+48
+00:05:46,000 --> 00:05:54,000
+因此，Lanchain提供了几种方便的内存来存储和累积对话。
+So Lanchain provides several convenient kinds of memory to store and accumulate the conversation.
+
+49
+00:05:54,000 --> 00:06:00,000
+到目前为止，我们一直在看对话缓冲区内存。让我们看看另一种类型的内存。
+So far, we've been looking at the conversation buffer memory. Let's look at a different type of memory.
+
+50
+00:06:00,000 --> 00:06:09,000
+我将导入只保留一个窗口内存的对话缓冲区窗口内存。
+I'm going to import the conversation buffer window memory that only keeps a window of memory.
+
+51
+00:06:09,000 --> 00:06:20,000
+如果我将内存设置为具有k等于1的对话缓冲区窗口内存，则变量k等于1指定我只想记住一个对话交换。
+If I set memory to conversational buffer window memory with k equals one, the variable k equals one specifies that I want it to remember just one conversational exchange.
+
+52
+00:06:20,000 --> 00:06:25,000
+也就是我和聊天机器人的一次发言。
+That is one utterance from me and one utterance from the chatbot.
+
+53
+00:06:25,000 --> 00:06:31,000
+所以现在，如果我让它保存上下文，嗨，怎么样，没什么，只是闲逛。
+So now if I were to have it save context, hi, what's up, not much, just hanging.
+
+54
+00:06:31,000 --> 00:06:38,000
+如果我查看内存点加载变量，它只记住最近的话语。
+If I were to look at memory dot load variables, it only remembers the most recent utterance.
+
+55
+00:06:38,000 --> 00:06:45,000
+请注意，它已经删除了。嗨，怎么样？它只是说，人类说没什么，只是闲逛，AI说很酷。
+Notice it's dropped. Hi, what's up? It's just saying, human says not much, just hanging, and the AI says cool.
+
+56
+00:06:45,000 --> 00:06:48,000
+所以这是一个很好的功能，因为它可以让你跟踪最近的几个对话术语。
+So that's because k was equal to one.
+
+57
+00:06:48,000 --> 00:06:56,000
+在实践中，您可能不会使用k等于1。您将使用k设置为更大的数字。
+So this is a nice feature because it lets you keep track of just the most recent few conversational terms.
+
+58
+00:06:56,000 --> 00:07:03,000
+但是，这仍然可以防止随着对话的进行，内存无限增长。
+In practice, you probably won't use this with k equals one. You use this with k set to a larger number.
+
+59
+00:07:03,000 --> 00:07:10,000
+所以，如果我重新运行我们刚才的对话，我们会说，嗨，我叫安德鲁。
+But still, this prevents the memory from growing without limit as the conversation goes longer.
+
+60
+00:07:10,000 --> 00:07:23,000
+1加1等于多少？现在我问它，我的名字是什么？
+And so if I were to rerun the conversation that we had just now, we'll say, hi, my name is Andrew.
+
+61
+00:07:23,000 --> 00:07:32,000
+因为k等于1，它只记得最后一次交流，而不是1加1等于什么？
+What is one plus one? And now I ask it, what is my name?
+
+62
+00:07:32,000 --> 00:07:37,000
+答案是1加1等于2，它已经忘记了这个早期的交流，现在说，
+Because k equals one, it only remembers the last exchange versus what is one plus one?
+
+63
+00:07:37,000 --> 00:07:42,000
+抱歉，没有访问那些信息。
+The answer is one plus one equals two, and it's forgotten this early exchange, which is now, now says,
+
+64
+00:07:42,000 --> 00:07:46,000
+我希望你能做的一件事是暂停视频，在左侧的代码中将其更改为true，
+ 
+sorry, don't have access to that information.
+
+65
+00:07:53,000 --> 00:07:57,000
+并使用verbose等于true重新运行此对话。
+One thing I hope you will do is pause the video, change this to true in the code on the left,
+
+66
+00:07:57,000 --> 00:08:00,000
+然后您将看到实际用于生成此内容的提示。
+and rerun this conversation with verbose equals true.
+
+67
+00:08:00,000 --> 00:08:08,000
+希望您能看到当您在调用LLM时，询问“我的名字是什么”时，
+And then you will see the prompts actually used to generate this.
+
+68
+00:08:08,000 --> 00:08:11,000
+内存已删除了我学习“我的名字是什么”的交换，
+And hopefully you see that the memory, when you're calling the LLM on what is my name,
+
+69
+00:08:11,000 --> 00:08:17,000
+这就是为什么现在它说不知道我的名字。
+that the memory has dropped this exchange where I learned what is my name,
+
+70
+00:08:17,000 --> 00:08:28,000
+使用对话令牌缓冲器内存，内存将限制保存的令牌数量。
+which is why it now says it doesn't know what is my name.
+
+71
+00:08:28,000 --> 00:08:39,000
+由于LLM定价的很多是基于令牌的，因此这更直接地映射到LLM调用的成本。
+With the conversational token buffer memory, the memory will limit the number of tokens saved.
+
+72
+00:08:39,000 --> 00:08:47,000
+因此，如果我说最大令牌限制等于50，实际上让我注入一些评论。
+And because a lot of LLM pricing is based on tokens, this maps more directly to the cost of the LLM calls.
+
+73
+00:08:47,000 --> 00:08:51,000
+所以让我们说，对话是，AI是什么？惊人。
+So if I were to say the max token limit is equal to 50, and actually let me inject a few comments.
+
+74
+00:08:51,000 --> 00:08:54,000
+反向传播是什么？美丽。聊天机器人是什么？迷人。
+So let's say the conversation is, AI is what? Amazing.
+
+75
+00:08:54,000 --> 00:08:58,000
+我使用ABC作为所有这些对话术语的第一个字母。
+Backpropagation is what? Beautiful. Chatbot is what? Charming.
+
+76
+00:08:58,000 --> 00:09:02,000
+我们可以跟踪，嗯，什么时候说了什么。
+I use ABC as the first letter of all of these conversational terms.
+
+77
+00:09:02,000 --> 00:09:08,000
+如果我使用高令牌限制运行它，它几乎包含了整个对话。
+We can keep track of, um, what was said when.
+
+78
+00:09:08,000 --> 00:09:14,000
+如果我将令牌限制增加到100，它现在包含了整个对话。
+If I run this with a high token limit, um, it has almost the whole conversation.
+
+79
+00:09:14,000 --> 00:09:24,000
+所以我有AI是什么？如果我减少它，那么，您知道，它会切掉这个对话的早期部分
+If I increase the token limit to 100, it now has the whole conversation.
+
+80
+00:09:24,000 --> 00:09:28,000
+以保留与最近的交流相对应的令牌数量，
+So I have AI is what? If I decrease it, then, you know, it chops off the earlier parts of this conversation
+
+81
+00:09:28,000 --> 00:09:32,000
+但不超过令牌限制。
+to retain the number of tokens corresponding to the most recent exchanges,
+
+82
+00:09:32,000 --> 00:09:35,000
+如果您想知道为什么我们需要指定LLM，
+um, but subject to not exceeding the token limit.
+
+83
+00:09:35,000 --> 00:09:39,000
+那是因为不同的LLM使用不同的令牌计数方式。
+And in case you're wondering why we needed to specify an LLM,
+
+84
+00:09:39,000 --> 00:09:46,000
+因此，这告诉它使用聊天OpenAI LLM使用的令牌计数方式。
+it's because different LLMs use different ways of counting tokens.
+
+85
+00:09:46,000 --> 00:09:49,000
+我鼓励您暂停视频并运行代码，
+So this tells it to use the way of counting tokens that the, um, chat open AI LLM uses.
+
+86
+00:09:49,000 --> 00:09:54,000
+并尝试修改提示以查看是否可以获得不同的输出。
+I encourage you to pause the video and run the code,
+
+87
+00:09:54,000 --> 00:09:58,000
+最后，我想在这里说明的最后一种记忆类型是对话摘要缓冲器记忆。
+and also try modifying the prompt to see if you can get a different output.
+
+88
+00:10:04,000 --> 00:10:12,000
+这个想法是，不是将内存限制为基于最近话语的固定数量的令牌
+Finally, there's one last type of memory I want to illustrate here,
+
+89
+00:10:12,000 --> 00:10:15,000
+或固定数量的对话交换，
+which is the conversation summary buffer memory.
+
+90
+00:10:15,000 --> 00:10:24,000
+让我们使用LLM编写对话摘要，并让其成为内存。
+ 
+And the idea is instead of limiting the memory to fixed number of tokens based on the most recent utterances
+
+91
+00:10:24,000 --> 00:10:29,000
+这里有一个例子，我将创建一个长字符串，其中包含某人的日程安排。
+or a fixed number of conversational exchanges,
+
+92
+00:10:29,000 --> 00:10:31,000
+你知道，有Meteor AM，我们是产品团队，
+let's use an LLM to write a summary of the conversation so far and let that be the memory.
+
+93
+00:10:31,000 --> 00:10:33,000
+你需要你的PowerPoint演示文稿等等。
+So here's an example where I'm going to create a long string with someone's schedule.
+
+94
+00:10:33,000 --> 00:10:38,000
+所以这是一个长字符串，说出你的日程安排，你知道的，
+You know, there's Meteor AM, we are product team,
+
+95
+00:10:38,000 --> 00:10:42,000
+也许以与客户在意大利餐厅的午餐结束，
+you need your PowerPoint presentation and so on and so on.
+
+96
+00:10:42,000 --> 00:10:46,000
+带上你的笔记本电脑，展示LLM，最新的LLM演示。
+So this is a long string saying what's your schedule, you know,
+
+97
+00:10:46,000 --> 00:10:53,000
+所以让我使用一个对话摘要缓存内存，嗯，
+maybe ending with a noon lunch at the Italian restaurant with a customer,
+
+98
+00:10:53,000 --> 00:10:58,000
+在这种情况下，最大令牌限制为400，令牌限制相当高。
+bring your laptop, show the LLM, latest LLM demo.
+
+99
+00:10:58,000 --> 00:11:05,000
+我将插入一些对话术语，以我们开始的方式，
+And so let me use a conversation summary buffer memory, um,
+
+100
+00:11:05,000 --> 00:11:10,000
+你好，怎么了，没有人只是闲逛，嗯，酷。
+with a max token limits of 400 in this case, pretty high token limit.
+
+101
+00:11:10,000 --> 00:11:17,000
+然后今天的日程安排是什么，回答是，你知道，那个长长的日程安排。
+And I'm going to insert in a few conversational terms in which we start with,
+
+102
+00:11:17,000 --> 00:11:22,000
+所以这个内存现在有相当多的文本。
+hello, what's up, no one's just hanging, uh, cool.
+
+103
+00:11:22,000 --> 00:11:26,000
+事实上，让我们看看内存变量。
+And then what is on the schedule today and the response is, you know, that long schedule.
+
+104
+00:11:26,000 --> 00:11:37,000
+它包含整个文本，因为400个令牌足以存储所有这些文本。
+So this memory now has quite a lot of text in it.
+
+105
+00:11:37,000 --> 00:11:43,000
+但是现在，如果我将最大令牌限制减少，比如将其减少到100个令牌，
+In fact, let's take a look at the memory variables.
+
+106
+00:11:43,000 --> 00:11:46,000
+请记住，这存储了整个对话历史记录。
+It contains that entire, um, piece of text because 400 tokens was sufficient to store all this text.
+
+107
+00:11:46,000 --> 00:11:50,000
+如果我将令牌数减少到100个，
+But now if I were to reduce the max token limit, say to 100 tokens,
+
+108
+00:11:50,000 --> 00:11:57,000
+那么对话摘要缓存内存实际上已经使用了LLM，
+remember this stores the entire conversational history.
+
+109
+00:11:57,000 --> 00:12:01,000
+在这种情况下，我们已经将LLM设置为open AI端点，
+If I reduce the number of tokens to 100,
+
+110
+00:12:01,000 --> 00:12:05,000
+以生成到目前为止对话的摘要。
+then the conversation summary buffer memory has actually used an LLM,
+
+111
+00:12:05,000 --> 00:12:09,000
+因此，摘要是人工智能在计划日程之前进行了闲聊，
+the open AI endpoint in this case, because that's what we have set the LLM to,
+
+112
+00:12:09,000 --> 00:12:12,000
+并在早晨会议上通知人类，等等，
+to actually generate a summary of the conversation so far.
+
+113
+00:12:12,000 --> 00:12:17,000
+午餐会议与对人工智能感兴趣的客户，
+So the summary is human AI engaged in small talk before the scheduled day schedule,
+
+114
+00:12:17,000 --> 00:12:28,000
+最新的人工智能发展。如果我们使用这个LLM进行对话，
+and informs human in the morning meeting, blah, blah, blah,
+
+115
+00:12:28,000 --> 00:12:33,000
+然后创建一个对话链，与之前相同。
+um, lunch meeting with customer interested in AI, latest AI developments.
+
+116
+00:12:33,000 --> 00:12:41,000
+如果我们问，你知道什么是一个好的演示文稿吗？
+And so if we were to have a conversation using this LLM,
+
+117
+00:12:41,000 --> 00:12:43,000
+嗯，我说verbose=true。
+then create a conversation chain, same as before.
+
+118
+00:12:43,000 --> 00:12:53,000
+所以这里是提示，LLM认为当前的对话已经讨论过这个问题了，
+And, um, let's say that we were to ask, you know, input, what would be a good demo to show?
+
+119
+00:12:53,000 --> 00:12:56,000
+因为这是对话的摘要。
+ 
+Um, I said verbose equals true.
+
+120
+00:12:56,000 --> 00:13:03,000
+还有一点需要注意，如果你熟悉开放式AI聊天API端点，
+So here's the prompt, the LLM thinks the current conversation has had this discussion so far,
+
+121
+00:13:03,000 --> 00:13:07,000
+有一个特定的系统消息。
+because that's the summary of the conversation.
+
+122
+00:13:07,000 --> 00:13:11,000
+在这个例子中，这并没有使用官方的开放式AI系统消息。
+And just one note, if you're familiar with the open AI chat API endpoint,
+
+123
+00:13:11,000 --> 00:13:14,000
+它只是将其作为提示的一部分包含在内。
+there is a specific system message.
+
+124
+00:13:14,000 --> 00:13:16,000
+但它仍然运行得相当不错。
+In this example, this is not using the official open AI system message.
+
+125
+00:13:16,000 --> 00:13:21,000
+鉴于这个提示，你知道，LLM输出基本的对AI发展感兴趣的客户，
+It's just including it as part of the prompt here.
+
+126
+00:13:21,000 --> 00:13:24,000
+或者建议展示我们最新的NLP能力。
+But it nonetheless works pretty well.
+
+127
+00:13:24,000 --> 00:13:26,000
+好的，很酷。
+And given this prompt, you know, the LLM outputs basic customer interested in AI developments,
+
+128
+00:13:26,000 --> 00:13:31,000
+嗯，它正在做一些向酷炫演示的建议，
+or suggests showcasing our latest NLP capabilities.
+
+129
+00:13:31,000 --> 00:13:35,000
+并让你想到如果我遇到一个客户，我会说，
+Okay, that's cool.
+
+130
+00:13:35,000 --> 00:13:43,000
+天哪，如果有一个开源框架可以帮助我使用LLMs构建酷炫的NLP应用程序。
+Um, well, it's, you know, making some suggestions to the cool demos,
+
+131
+00:13:43,000 --> 00:13:46,000
+好事正在发生。
+and makes you think if I was meeting a customer, I would say,
+
+132
+00:13:46,000 --> 00:13:58,000
+有趣的是，如果你现在看看记忆发生了什么。
+boy, if only there were open source framework available to help me build cool NLP applications using LLMs.
+
+133
+00:13:58,000 --> 00:14:04,000
+请注意，这里已经合并了最近的AI系统输出，
+Good things are launching.
+
+134
+00:14:04,000 --> 00:14:11,000
+而我的话问它是否是一个好的演示已经被合并到系统消息中。
+Um, and the interesting thing is, if you now look at what has happened to the memory.
+
+135
+00:14:11,000 --> 00:14:14,000
+你知道，到目前为止的对话总结。
+So notice that, um, here it has incorporated the most recent AI system output,
+
+136
+00:14:14,000 --> 00:14:17,000
+通过对话总结缓冲区记忆，
+whereas my utterance asking it won't be a good demo to show has been incorporated into the system message.
+
+137
+00:14:17,000 --> 00:14:27,000
+它试图保持消息的显式存储，直到我们指定的令牌数为止。
+Um, you know, the overall summary of the conversation so far.
+
+138
+00:14:27,000 --> 00:14:30,000
+所以，你知道，这部分，显式存储，
+With the conversation summary buffer memory,
+
+139
+00:14:30,000 --> 00:14:34,000
+我们试图将其限制在100个令牌，因为这是我们要求的。
+what it tries to do is keep the explicit storage of the messages up to the number of tokens we have specified as a limit.
+
+140
+00:14:34,000 --> 00:14:38,000
+然后，任何超过这个限制的内容，它都将使用LLM生成一个摘要，
+So, you know, this part, the explicit storage,
+
+141
+00:14:38,000 --> 00:14:41,000
+这就是上面看到的内容。
+we're trying to cap at 100 tokens because that's what we're asking for.
+
+142
+00:14:41,000 --> 00:14:46,000
+即使我使用聊天作为一个运行示例来说明这些不同的记忆，
+And then anything beyond that, it will use the LLM to generate a summary,
+
+143
+00:14:46,000 --> 00:14:49,000
+这些记忆也对其他应用程序有用，
+which is what is seen up here.
+
+144
+00:14:49,000 --> 00:14:54,000
+在这些应用程序中，你可能会不断地获得新的文本片段或新的信息，
+And even though I've illustrated these different memories using a chat as a running example,
+
+145
+00:14:54,000 --> 00:14:59,000
+比如如果你的系统反复在线搜索事实，
+these memories are useful for other applications too,
+
+146
+00:14:59,000 --> 00:15:04,000
+但你希望保持用于存储这个不断增长的事实列表的总内存大小为，
+where you might keep on getting new snippets of text or keep on getting new information,
+
+147
+00:15:04,000 --> 00:15:07,000
+有限的，而不是任意增长。
+such as if your system repeatedly goes online to search for facts,
+
+148
+00:15:07,000 --> 00:15:11,000
+我鼓励你暂停视频并运行代码。
+ 
+but you want to keep the total memory used to store this growing list of facts as, you know,
+
+149
+00:15:11,000 --> 00:15:15,000
+在这个视频中，你看到了一些类型的内存，包括基于对话交换或令牌数量限制的缓冲内存，
+capped and not growing arbitrarily long.
+
+150
+00:15:15,000 --> 00:15:21,000
+或者可以总结超过一定限制的令牌的内存。
+I encourage you to pause the video and run the code.
+
+151
+00:15:21,000 --> 00:15:26,000
+Lanchain实际上还支持其他类型的内存。
+In this video, you saw a few types of memory, um,
+
+152
+00:15:30,000 --> 00:15:33,000
+其中最强大的之一是向量数据内存。
+including buffer memories that limits based on number of conversation exchanges or tokens,
+
+153
+00:15:33,000 --> 00:15:36,000
+如果你熟悉单词嵌入和文本嵌入，
+or a memory that can summarize tokens above a certain limit.
+
+154
+00:15:36,000 --> 00:15:39,000
+向量数据库实际上存储这样的嵌入。
+Lanchain actually supports additional memory types as well.
+
+155
+00:15:39,000 --> 00:15:41,000
+如果你不知道这是什么意思，不用担心。
+One of the most powerful is vector data memory.
+
+156
+00:15:41,000 --> 00:15:43,000
+哈里森会在后面解释。
+If you're familiar with word embeddings and text embeddings,
+
+157
+00:15:43,000 --> 00:15:51,000
+然后，它可以使用这种类型的向量数据库检索最相关的文本块作为其内存。
+the vector database actually stores such embeddings.
+
+158
+00:15:51,000 --> 00:15:54,000
+Lanchain还支持实体内存，
+If you don't know what that means, don't worry about it.
+
+159
+00:15:54,000 --> 00:15:58,000
+当你想让它记住特定人物的细节时，这是适用的，
+Harrison will explain it later.
+
+160
+00:15:58,000 --> 00:16:04,000
+特定的其他实体，比如如果你谈论一个特定的朋友，
+And it can then retrieve the most relevant blocks of text using this type of vector database for its memory.
+
+161
+00:16:04,000 --> 00:16:08,000
+你可以让Lanchain记住关于那个朋友的事实，
+And Lanchain also supports entity memories,
+
+162
+00:16:08,000 --> 00:16:12,000
+这将是一种明确的实体。
+which is applicable when you want it to remember details about specific people,
+
+163
+00:16:12,000 --> 00:16:14,000
+当你使用Lanchain实现应用程序时，
+specific other entities, such as if you talk about a specific friend,
+
+164
+00:16:14,000 --> 00:16:17,000
+你还可以使用多种类型的内存，
+you can have Lanchain remember facts about that friend,
+
+165
+00:16:17,000 --> 00:16:22,000
+比如使用你在这个视频中看到的一种对话内存类型。
+which would be an entity in an explicit way.
+
+166
+00:16:22,000 --> 00:16:26,000
+此外，还可以使用实体内存来回忆个人。
+When you're implementing applications using Lanchain,
+
+167
+00:16:26,000 --> 00:16:30,000
+这样它就可以记住对话的摘要，
+you can also use multiple types of memories,
+
+168
+00:16:30,000 --> 00:16:35,000
+再加上以明确的方式存储重要人物的重要事实。
+such as using one of the types of conversation memory that you saw in this video.
+
+169
+00:16:35,000 --> 00:16:38,000
+当然，除了使用这些内存类型之外，
+Plus additionally, entity memory to recall individuals.
+
+170
+00:16:38,000 --> 00:16:43,000
+开发人员还经常将整个对话存储在传统数据库中，
+So this way it can remember maybe a summary of the conversation,
+
+171
+00:16:43,000 --> 00:16:46,000
+某种键值存储或SQL数据库。
+plus an explicit way of storing important facts about important people in the conversation.
+
+172
+00:16:46,000 --> 00:16:51,000
+因此，你可以回顾整个对话以进行审计或进一步改进系统。
+And of course, in addition to using these memory types,
+
+173
+00:16:51,000 --> 00:16:53,000
+这就是内存类型。
+it's also not uncommon for developers to store the entire conversation in the conventional database,
+
+174
+00:16:53,000 --> 00:16:57,000
+我希望你在构建自己的应用程序时会发现这个视频有用。
+some sort of key value store or SQL database.
+
+175
+00:16:57,000 --> 00:17:21,000
+现在，让我们继续下一个视频，了解Lanchain的关键构建块，即链。
+So you could refer back to the whole conversation for auditing or for improving the system further.
